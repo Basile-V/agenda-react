@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     restoreMocks: true,
     // Deterministic dates, and a zone with daylight saving time to exercise it.
-    env: { TZ: 'Europe/Paris' },
+    // .env is not versioned: tests must not depend on the developer's machine.
+    env: { TZ: 'Europe/Paris', VITE_API_BASE_URL: 'http://api.test' },
   },
 });

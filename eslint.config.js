@@ -21,5 +21,9 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
+    rules: {
+      // `const { password: _, ...user } = …` is the idiomatic way to omit a property.
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    },
   },
 ]);

@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
+import { resetDb } from './db';
+import { clearXsrfCookie } from './handlers';
 import { server } from './server';
 
 // jsdom implements neither <dialog> modality nor ResizeObserver.
@@ -20,8 +22,10 @@ globalThis.ResizeObserver = class ResizeObserver {
 };
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeEach(() => resetDb());
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  clearXsrfCookie();
 });
 afterAll(() => server.close());

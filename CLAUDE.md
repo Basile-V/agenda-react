@@ -205,7 +205,7 @@ Conventions de fichiers :
 - Pas de `any` (utiliser `unknown` + affinage). Pas de `as` pour contourner le typage, sauf
   à la frontière de l'API après validation.
 - `import type` pour les imports de types (`verbatimModuleSyntax`).
-- Types du domaine dans `api/types.ts` : `Event`, `EventPayload`, `User`.
+- Types du domaine dans `api/types.ts` : `CalendarEvent` (pas `Event`, qui masquerait le type DOM), `EventPayload`, `User`.
 - Unions discriminées pour les états (`{ status: 'loading' } | { status: 'success'; events } | …`)
   plutôt que plusieurs booléens.
 

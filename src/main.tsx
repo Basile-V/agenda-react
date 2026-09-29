@@ -9,6 +9,9 @@ async function enableMocking() {
   if (import.meta.env.MODE !== 'mock') return;
   const { setupWorker } = await import('msw/browser');
   const { handlers } = await import('./test/handlers');
+  const { resetDb } = await import('./test/db');
+  // ponytail: mock session is lost on reload, persist it in sessionStorage if demos need it
+  resetDb();
   await setupWorker(...handlers).start({ onUnhandledRequest: 'bypass' });
 }
 
