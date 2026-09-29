@@ -6,7 +6,7 @@ import { ADMIN, BASILE, DEMO_PASSWORD, db } from '../../test/db';
 import { apiUrl } from '../../test/handlers';
 import { renderWithRouter } from '../../test/renderWithRouter';
 import { server } from '../../test/server';
-import { toDateKey } from '../calendar/time';
+import { formatDayTitle, toDateKey } from '../calendar/time';
 
 const today = () => toDateKey(new Date());
 
@@ -19,7 +19,7 @@ function registerPanel() {
 }
 
 async function findDayPage(date: string) {
-  return screen.findByRole('heading', { level: 1, name: date });
+  return screen.findByRole('heading', { level: 1, name: formatDayTitle(date) });
 }
 
 describe('route protection', () => {

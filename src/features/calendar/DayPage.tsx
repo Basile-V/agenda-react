@@ -1,21 +1,48 @@
 import { useParams } from 'react-router';
-import { useAuth } from '../auth/useAuth';
 import { Button } from '../../ui/Button';
+import { Spinner } from '../../ui/Spinner';
+import { useCurrentUser } from '../auth/useAuth';
+import { CalendarHeader } from './CalendarHeader';
+import { DayGrid } from './DayGrid';
+import styles from './DayPage.module.css';
+import { formatDayTitle, isValidDateKey } from './time';
+import { TodayRedirect } from './TodayRedirect';
+import { useDayEvents } from './useDayEvents';
 
-// ponytail: placeholder until phase 5 (header, navigation, grid)
 export function DayPage() {
-  const { date } = useParams();
-  const { session, logout } = useAuth();
-  const displayName = session.status === 'authenticated' ? session.user.displayName : '';
+  const { date = '' } = useParams();
+  if (!isValidDateKey(date)) return <TodayRedirect />;
+  // Keyed by date: nothing of a day's page state leaks into the next one.
+  return <Day key={date} date={date} />;
+}
+
+function Day({ date }: { date: string }) {
+  const user = useCurrentUser();
+  const dayEvents = useDayEvents(date);
 
   return (
-    <main>
-      <title>{`${date ?? ''} · Agenda`}</title>
-      <h1>{date}</h1>
-      <p>{displayName}</p>
-      <Button variant="ghost" onClick={() => void logout()}>
-        Se déconnecter
-      </Button>
-    </main>
+    <div className={styles.page}>
+      <title>{`${formatDayTitle(date)} · Agenda`}</title>
+      <CalendarHeader date={date} />
+      <main className={styles.main} aria-busy={dayEvents.status === 'loading'}>
+        <DayGrid
+          events={dayEvents.status === 'success' ? dayEvents.events : []}
+          currentUserId={user.id}
+        />
+        {dayEvents.status === 'loading' && (
+          <div className={styles.overlay}>
+            <Spinner label="Chargement des événements…" />
+          </div>
+        )}
+        {dayEvents.status === 'error' && (
+          <div className={styles.overlay}>
+            <div role="alert" className={styles.error}>
+              <p>{dayEvents.message}</p>
+              <Button onClick={dayEvents.retry}>Réessayer</Button>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

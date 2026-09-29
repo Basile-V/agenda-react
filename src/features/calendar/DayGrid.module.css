@@ -1,0 +1,31 @@
+.grid {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  /* Stretched to the page height by .main, never squeezed below readable. */
+  min-height: 45rem;
+  /* Room for the first and last hour labels, centred on their line. */
+  padding-block: var(--space-3);
+  padding-right: var(--space-2);
+}
+
+.hours {
+  position: relative;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.hours li {
+  position: absolute;
+  top: calc(var(--index) / var(--hours) * 100%);
+  right: var(--space-2);
+  transform: translateY(-50%);
+}
+
+.events {
+  position: relative;
+  border-bottom: 1px solid var(--color-border);
+  background-image: linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 100% calc(100% / var(--hours));
+}

@@ -15,6 +15,10 @@
   --color-focus: #3a5bd9;
   --color-event-bg: #e3e9fc;
   --color-event-border: #3a5bd9;
+  --color-event-other-bg: #eef0f3;
+  --color-event-other-border: #818b98;
+  --color-success: #1e7a45;
+  --color-overlay: rgb(255 255 255 / 0.6);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;

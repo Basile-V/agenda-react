@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'vitest';
-import { addDays, fromDateKey, isValidDateKey, parseTimeToMinutes, toDateKey } from './time';
+import {
+  addDays,
+  formatDayTitle,
+  fromDateKey,
+  isValidDateKey,
+  parseTimeToMinutes,
+  toDateKey,
+} from './time';
 
 describe('parseTimeToMinutes', () => {
   test.each([
@@ -90,5 +97,12 @@ describe('addDays', () => {
     expect(addDays('2026-03-28', 1)).toBe('2026-03-29');
     expect(addDays('2026-03-29', 1)).toBe('2026-03-30');
     expect(addDays('2026-10-25', 1)).toBe('2026-10-26');
+  });
+});
+
+describe('formatDayTitle', () => {
+  test('long French date, weekday first', () => {
+    expect(formatDayTitle('2026-09-29')).toBe('mardi 29 septembre 2026');
+    expect(formatDayTitle('2027-01-01')).toBe('vendredi 1 janvier 2027');
   });
 });

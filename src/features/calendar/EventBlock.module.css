@@ -1,0 +1,48 @@
+.event {
+  position: absolute;
+  overflow: hidden;
+  padding: 2px var(--space-2);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
+
+.own {
+  background: var(--color-event-bg);
+  border-color: var(--color-event-border);
+}
+
+.other {
+  background: var(--color-event-other-bg);
+  border-color: var(--color-event-other-border);
+}
+
+.title {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.id {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.badge {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-success);
+  color: var(--color-primary-contrast);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}

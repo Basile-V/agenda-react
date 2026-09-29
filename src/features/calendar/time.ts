@@ -40,3 +40,15 @@ export function addDays(key: string, days: number): string {
   date.setDate(date.getDate() + days);
   return toDateKey(date);
 }
+
+const dayTitleFormat = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+/** '2026-09-29' → 'mardi 29 septembre 2026' */
+export function formatDayTitle(key: string): string {
+  return dayTitleFormat.format(fromDateKey(key));
+}
