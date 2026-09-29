@@ -10,7 +10,8 @@ import {
 } from './client';
 
 beforeEach(() => {
-  vi.useFakeTimers({ shouldAdvanceTime: true });
+  // Strict fake clock: advancing with real time would make the 2s threshold racy under load.
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 });
 
 afterEach(() => {

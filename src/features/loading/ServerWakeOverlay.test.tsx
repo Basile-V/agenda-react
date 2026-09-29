@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { SLOW_REQUEST_DELAY_MS, apiFetch } from '../../api/client';
@@ -7,7 +7,8 @@ import { server } from '../../test/server';
 import { ServerWakeOverlay } from './ServerWakeOverlay';
 
 beforeEach(() => {
-  vi.useFakeTimers({ shouldAdvanceTime: true });
+  // Strict fake clock: advancing with real time would make the 2s threshold racy under load.
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 });
 
 afterEach(() => {
@@ -27,12 +28,17 @@ test('shows while a request is slow, then goes away', async () => {
   const request = apiFetch('/api/slow');
 
   await act(() => vi.advanceTimersByTimeAsync(SLOW_REQUEST_DELAY_MS - 1));
-  expect(screen.queryByText('Le serveur se réveille…')).toBeNull();
+  expect(screen.queryByRole('dialog')).toBeNull();
 
   await act(() => vi.advanceTimersByTimeAsync(1));
-  expect(screen.getByRole('status')).toHaveTextContent('Le serveur se réveille…');
+  const dialog = screen.getByRole('dialog', { name: 'Le serveur se réveille…' });
+  expect(dialog).toHaveTextContent("jusqu'à une minute");
+
+  // A blocking wait: Escape does not dismiss it.
+  fireEvent(dialog, new Event('cancel', { cancelable: true }));
+  expect(screen.getByRole('dialog')).toBeInTheDocument();
 
   respond();
   await act(() => request);
-  expect(screen.queryByRole('status')).toBeNull();
+  expect(screen.queryByRole('dialog')).toBeNull();
 });

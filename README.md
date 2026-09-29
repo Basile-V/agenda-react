@@ -32,7 +32,10 @@ crée, modifie et supprime des événements, avec une gestion fine des chevauche
 - **Réveil du serveur** : message statique avant le démarrage de React, puis overlay de
   chargement pour toute requête qui dépasse 2 s.
 - **Accessibilité** : navigation clavier, focus piégé et restitué dans les modales, rôles et
-  labels ARIA.
+  labels ARIA, contrastes AA vérifiés.
+- **Thème clair / sombre** : clair par défaut, bouton de bascule dans l'en-tête et sur la page
+  de connexion, choix mémorisé (`localStorage`) et appliqué avant le premier affichage.
+- **Affichage adapté au mobile**.
 
 ## Stack
 

@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
 import { Tabs } from '../../ui/Tabs';
+import { ThemeToggle } from '../../ui/ThemeToggle';
 import styles from './LoginPage.module.scss';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
@@ -24,6 +25,9 @@ export function LoginPage() {
   return (
     <main className={styles.page}>
       <title>Connexion · Agenda</title>
+      <div className={styles.theme}>
+        <ThemeToggle />
+      </div>
       <div className={styles.card}>
         <h1 className={styles.title}>Agenda</h1>
         <Tabs

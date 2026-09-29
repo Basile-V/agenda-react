@@ -5,11 +5,15 @@
   gap: var(--space-2) var(--space-4);
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
+
+  @media (width < 30rem) {
+    column-gap: var(--space-2);
+    padding-inline: var(--space-2);
+  }
 }
 
 .title {
-  flex: 1 1 14rem;
-  font-size: 1.25rem;
+  font-size: clamp(1.0625rem, 4vw, 1.25rem);
 
   &::first-letter {
     text-transform: uppercase;
@@ -53,6 +57,8 @@
 }
 
 .user {
+  /* Title and day navigation stay together on the left, the user goes to the right. */
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: var(--space-1);

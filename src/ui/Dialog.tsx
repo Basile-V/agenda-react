@@ -3,8 +3,12 @@ import styles from './Dialog.module.scss';
 
 type DialogProps = {
   title: string;
-  /** Escape, backdrop click: the parent decides, by unmounting the dialog. */
-  onClose: () => void;
+  /**
+   * Escape, backdrop click: the parent decides, by unmounting the dialog. Without it, the
+   * dialog cannot be dismissed (blocking wait).
+   */
+  onClose?: (() => void) | undefined;
+  className?: string | undefined;
   children: ReactNode;
 };
 
@@ -12,7 +16,7 @@ type DialogProps = {
  * Modal <dialog>, open while mounted. The browser provides the focus trap, Escape and the
  * inert background; we give the focus back to whatever opened it.
  */
-export function Dialog({ title, onClose, children }: DialogProps) {
+export function Dialog({ title, onClose, className, children }: DialogProps) {
   const titleId = useId();
 
   // Stable: a new callback on every render would close and reopen the dialog each time.
@@ -34,14 +38,14 @@ export function Dialog({ title, onClose, children }: DialogProps) {
       onCancel={(event) => {
         // Keep React in charge of the open state: the parent unmounts us.
         event.preventDefault();
-        onClose();
+        onClose?.();
       }}
       onClick={(event) => {
         // The dialog itself only receives clicks on its backdrop, its content fills it.
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) onClose?.();
       }}
     >
-      <div className={styles.content}>
+      <div className={[styles.content, className].filter(Boolean).join(' ')}>
         <h2 id={titleId} className={styles.title}>
           {title}
         </h2>

@@ -6,6 +6,12 @@
   background: var(--color-surface);
 }
 
+.theme {
+  position: fixed;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
 .card {
   width: min(100%, 26rem);
   padding: var(--space-8) var(--space-6);

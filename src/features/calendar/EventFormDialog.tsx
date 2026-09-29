@@ -77,7 +77,12 @@ export function EventFormDialog({
   }
 
   function handleBlur(event: FocusEvent<HTMLFormElement>) {
-    if (event.target instanceof HTMLInputElement) showError(event.target);
+    // Only when moving on to another part of the form: leaving the dialog (closing it)
+    // is no reason to flag a field.
+    if (!(event.target instanceof HTMLInputElement)) return;
+    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+      showError(event.target);
+    }
   }
 
   function handleInput(event: FormEvent<HTMLFormElement>) {

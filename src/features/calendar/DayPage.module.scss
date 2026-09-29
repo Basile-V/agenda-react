@@ -6,6 +6,8 @@
 
 .main {
   position: relative;
+  /* The last hours stay reachable above the floating "+" button. */
+  padding-bottom: 5.5rem;
   display: grid;
   flex: 1;
   min-height: 0;

@@ -1,31 +1,13 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: grid;
-  place-items: center;
-  padding: var(--space-4);
-  background: rgb(0 0 0 / 0.4);
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
+.content {
   align-items: center;
-  gap: var(--space-3);
-  max-width: 26rem;
-  padding: var(--space-8) var(--space-6);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
-  box-shadow: var(--shadow-lg);
+  padding-block: var(--space-8);
   color: var(--color-primary);
   text-align: center;
-}
 
-.title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text);
+  h2 {
+    font-size: 1.125rem;
+    color: var(--color-text);
+  }
 }
 
 .message {

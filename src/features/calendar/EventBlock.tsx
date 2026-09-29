@@ -59,8 +59,8 @@ export function EventBlock({ event, position, isOwn, onSelect }: EventBlockProps
       </p>
       <p className={styles.meta}>
         <time>{event.start}</time> · {event.duration} min
-        {event.isPublic && <span className={styles.badge}>Public</span>}
       </p>
+      {event.isPublic && <span className={styles.badge}>Public</span>}
     </div>
   );
 }

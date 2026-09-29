@@ -254,7 +254,9 @@ font dans le dépôt `agenda`, pas ici : les signaler s'ils ne sont pas faits.
   - `findBy…` / `waitFor` pour l'asynchrone, jamais de `setTimeout` manuel.
 - API simulée par **MSW** (handlers partagés dans `src/test/`), `onUnhandledRequest: 'error'`,
   `server.resetHandlers()` après chaque test. On ne mocke pas `fetch` ni les modules maison.
-- Faux timers Vitest (`vi.useFakeTimers({ shouldAdvanceTime: true })`) pour le délai de 2 s.
+- Faux timers Vitest stricts (`vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })`)
+  pour le délai de 2 s : avec `shouldAdvanceTime`, le temps réel s'ajoute et le seuil devient
+  instable sous charge.
 - jsdom n'implémente ni `ResizeObserver` ni `HTMLDialogElement.showModal` : les polyfiller
   dans le setup de test.
 - Un helper `renderWithRouter` (router mémoire + providers) pour les tests d'intégration.

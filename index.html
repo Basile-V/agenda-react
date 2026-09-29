@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Agenda : vue jour d'événements, en React 19" />
+    <script>
+      // Before the first paint, so that a dark theme chosen earlier does not flash light.
+      // Same storage key as src/ui/ThemeToggle.tsx.
+      try {
+        if (localStorage.getItem('theme') === 'dark')
+          document.documentElement.dataset.theme = 'dark';
+      } catch {
+        // Storage unavailable (private mode, blocked cookies): keep the light theme.
+      }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Agenda</title>
     <style>
       /* Shown before the JavaScript runs, hence inline: no stylesheet to wait for. */
@@ -41,6 +52,19 @@
       .boot-message {
         max-width: 26rem;
         margin: 0;
+      }
+      [data-theme='dark'] body {
+        background: #0f1115;
+      }
+      [data-theme='dark'] .boot {
+        color: #9aa4b2;
+      }
+      [data-theme='dark'] .boot-spinner {
+        border-color: #7b96ff;
+        border-right-color: transparent;
+      }
+      [data-theme='dark'] .boot-title {
+        color: #e6e8eb;
       }
       @keyframes boot-spin {
         to {
