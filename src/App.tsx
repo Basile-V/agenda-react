@@ -1,5 +1,6 @@
 import { RouterProvider } from 'react-router';
 import { AuthProvider } from './features/auth/AuthProvider';
+import { ServerWakeOverlay } from './features/loading/ServerWakeOverlay';
 import { router } from './router';
 
 export function App() {
@@ -8,6 +9,7 @@ export function App() {
       {/* Our navigations have no loaders to wait for. Wrapped in transitions (the default),
           they would be held back by any pending optimistic mutation. */}
       <RouterProvider router={router} useTransitions={false} />
+      <ServerWakeOverlay />
     </AuthProvider>
   );
 }

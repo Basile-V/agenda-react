@@ -94,11 +94,48 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, message);
 }
 
+// The free-tier backend sleeps when idle and takes up to a minute to wake up. Only requests
+// slower than this are reported, so that a normal response never makes the overlay flash.
+export const SLOW_REQUEST_DELAY_MS = 2000;
+
+let slowRequestCount = 0;
+const slowRequestListeners = new Set<() => void>();
+
+function setSlowRequestCount(count: number) {
+  slowRequestCount = count;
+  for (const listener of slowRequestListeners) listener();
+}
+
+/** Number of requests pending for more than SLOW_REQUEST_DELAY_MS. */
+export function getSlowRequestCount(): number {
+  return slowRequestCount;
+}
+
+/** Shaped for useSyncExternalStore. Returns an unsubscribe function. */
+export function subscribeToSlowRequests(listener: () => void): () => void {
+  slowRequestListeners.add(listener);
+  return () => slowRequestListeners.delete(listener);
+}
+
 /**
  * Sends a request to the API with the session cookies and the CSRF token, and returns the
  * parsed JSON body (undefined when there is none). Validating its shape is up to the caller.
  */
 export async function apiFetch(path: string, options: RequestOptions = {}): Promise<unknown> {
+  let isSlow = false;
+  const timer = setTimeout(() => {
+    isSlow = true;
+    setSlowRequestCount(slowRequestCount + 1);
+  }, SLOW_REQUEST_DELAY_MS);
+  try {
+    return await request(path, options);
+  } finally {
+    clearTimeout(timer);
+    if (isSlow) setSlowRequestCount(slowRequestCount - 1);
+  }
+}
+
+async function request(path: string, options: RequestOptions): Promise<unknown> {
   const method = options.method ?? 'GET';
   let { response, xsrfToken } = await send(path, options);
 

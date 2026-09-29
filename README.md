@@ -41,7 +41,7 @@ crée, modifie et supprime des événements, avec une gestion fine des chevauche
 | Build | Vite, TypeScript `strict` |
 | UI | React 19 (fonctions + hooks) |
 | Routage | `react-router` v8 (mode librairie, `createBrowserRouter`) |
-| État | `useState` / `useReducer`, Context pour l'auth et le suivi des requêtes lentes |
+| État | `useState` / `useReducer`, Context pour l'auth, `useSyncExternalStore` pour les requêtes lentes |
 | Styles | Modules SCSS + variables CSS (thème modifiable à l'exécution) |
 | HTTP | `fetch` natif, encapsulé dans `apiFetch` |
 | Tests | Vitest, React Testing Library, `user-event`, MSW |
@@ -115,7 +115,7 @@ src/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
     calendar/   DayPage, CalendarHeader, DayGrid, EventBlock, dialogs, useDayEvents,
                 layout.ts, time.ts
-    loading/    LoadingProvider, ServerWakeOverlay
+    loading/    useIsWaitingForServer, ServerWakeOverlay
   ui/           composants génériques : Button, IconButton, Dialog, TextField, Tabs, Spinner, icons
   styles/       variables CSS (variables.scss), reset
 ```
@@ -125,7 +125,8 @@ src/
 - `apiFetch` est la seule fonction qui appelle `fetch`. Elle envoie les cookies
   (`credentials: 'include'`), ajoute le jeton CSRF sur les requêtes mutantes, rafraîchit la
   session une seule fois sur 401 puis rejoue la requête, et signale les requêtes lentes.
-- Seuls l'utilisateur courant et le compteur de requêtes lentes sont en Context. Les
+- Seul l'utilisateur courant est en Context. Le compteur de requêtes lentes vit dans le
+  client HTTP, hors de React, et se lit avec `useSyncExternalStore`. Les
   événements du jour vivent dans le hook `useDayEvents(date)`, qui annule les requêtes
   obsolètes (`AbortController`) quand la date change.
 

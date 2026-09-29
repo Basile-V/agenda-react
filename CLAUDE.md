@@ -67,7 +67,7 @@ src/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
     calendar/   DayPage, CalendarHeader, DayGrid, EventBlock, EventFormDialog,
                 EventDetailsDialog, useDayEvents, layout.ts, time.ts
-    loading/    LoadingProvider, ServerWakeOverlay
+    loading/    useIsWaitingForServer, ServerWakeOverlay
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
   styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
@@ -78,7 +78,8 @@ Règles de dépendance entre dossiers :
 - `ui/` ne connaît **ni** l'API **ni** le domaine (pas d'import depuis `api/` ou `features/`).
 - `features/*` peut importer `ui/`, `api/` et ses propres fichiers. Un feature n'importe un
   autre feature que via son hook public (ex. `useAuth` depuis `features/auth`).
-- `api/` ne dépend pas de React, sauf le point d'accroche des requêtes lentes (callback injecté).
+- `api/` ne dépend pas de React : il expose des abonnements (`onSessionExpired`,
+  `subscribeToSlowRequests`) que React lit (effet, `useSyncExternalStore`).
 - `layout.ts` et `time.ts` sont **purs** : aucun import React, aucun accès au DOM.
 
 Conventions de fichiers :
@@ -118,7 +119,8 @@ Conventions de fichiers :
 - Rendre directement le contexte : `<AuthContext value={auth}>`, **pas** `<AuthContext.Provider>`.
 - Lire un contexte avec `use(AuthContext)` (peut être appelé conditionnellement), encapsulé
   dans un hook (`useAuth`) qui lève une erreur explicite hors du provider.
-- Seuls l'utilisateur courant et le compteur de requêtes lentes vont en Context. Tout le reste
+- Seul l'utilisateur courant va en Context. Le compteur de requêtes lentes vit dans `api/` et se
+  lit avec `useSyncExternalStore` (pas de provider). Tout le reste
   reste local (état au plus près de son usage, remonté seulement si nécessaire).
 
 ### Formulaires et actions
