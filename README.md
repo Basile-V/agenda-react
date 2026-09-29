@@ -54,8 +54,8 @@ du kata, et tout le reste (calendrier, modales, onglets, client HTTP) est écrit
 
 ### Ce que React 19 apporte ici
 
-- `useActionState` + `<form action>` pour les formulaires de connexion, d'inscription et
-  d'événement (état d'envoi et erreurs sans `useState` manuel).
+- `useActionState` + `<form action>` + `useFormStatus` pour les formulaires de connexion et
+  d'inscription (état d'envoi et erreurs sans `useState` manuel).
 - `useOptimistic` pour la création, la modification et la suppression, avec retour arrière
   automatique en cas d'échec.
 - `ref` passé comme une prop ordinaire (plus de `forwardRef`).

@@ -5,7 +5,9 @@ import { router } from './router';
 export function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      {/* Our navigations have no loaders to wait for. Wrapped in transitions (the default),
+          they would be held back by any pending optimistic mutation. */}
+      <RouterProvider router={router} useTransitions={false} />
     </AuthProvider>
   );
 }

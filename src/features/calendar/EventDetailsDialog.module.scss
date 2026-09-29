@@ -1,0 +1,33 @@
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+
+  dt {
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  dd::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.readOnly {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.delete {
+  color: var(--color-danger);
+}
+
+.close {
+  margin-left: auto;
+}

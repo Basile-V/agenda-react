@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   addDays,
   formatDayTitle,
+  formatTime,
   fromDateKey,
   isValidDateKey,
   parseTimeToMinutes,
@@ -104,5 +105,22 @@ describe('formatDayTitle', () => {
   test('long French date, weekday first', () => {
     expect(formatDayTitle('2026-09-29')).toBe('mardi 29 septembre 2026');
     expect(formatDayTitle('2027-01-01')).toBe('vendredi 1 janvier 2027');
+  });
+});
+
+describe('formatTime', () => {
+  test.each([
+    [0, '00:00'],
+    [540, '09:00'],
+    [605, '10:05'],
+    [1439, '23:59'],
+    [1440, '00:00'],
+    [1500, '01:00'],
+  ])('%i → %s', (minutes, time) => {
+    expect(formatTime(minutes)).toBe(time);
+  });
+
+  test('is the inverse of parseTimeToMinutes', () => {
+    expect(formatTime(parseTimeToMinutes('17:45'))).toBe('17:45');
   });
 });

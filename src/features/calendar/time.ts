@@ -52,3 +52,10 @@ const dayTitleFormat = new Intl.DateTimeFormat('fr-FR', {
 export function formatDayTitle(key: string): string {
   return dayTitleFormat.format(fromDateKey(key));
 }
+
+/** Minutes since midnight → 'HH:MM', wrapping past midnight. */
+export function formatTime(minutes: number): string {
+  const wrapped = ((minutes % 1440) + 1440) % 1440;
+  const hours = String(Math.floor(wrapped / 60)).padStart(2, '0');
+  return `${hours}:${String(wrapped % 60).padStart(2, '0')}`;
+}

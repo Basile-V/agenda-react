@@ -134,12 +134,20 @@ Conventions de fichiers :
 - Après une action réussie, React réinitialise le formulaire non contrôlé : utiliser
   `defaultValue` plutôt que des champs contrôlés quand c'est possible. Les champs contrôlés
   sont réservés aux cas où la valeur pilote l'UI (ex. activer « Ajouter » seulement si valide).
+- Exception : un formulaire qui déclenche une **mutation optimiste** et se ferme aussitôt
+  (`EventFormDialog`) utilise `onSubmit`, pas `<form action>`. Une action est une transition :
+  la fermeture de la modale attendrait la réponse du serveur, entremêlée avec la mutation.
 
 ### Mises à jour optimistes
 
 - `useOptimistic` pour création, modification et suppression : on applique le changement
   optimiste **dans une action / `startTransition`**, puis on appelle l'API ; en cas d'erreur, la
   valeur optimiste disparaît d'elle-même à la fin de la transition, il suffit d'afficher le message.
+- Après un `await` dans une transition asynchrone, rendre la mise à jour d'état confirmée dans un
+  nouveau `startTransition(() => …)`, sinon l'événement optimiste et le confirmé coexistent.
+- Tant qu'une action asynchrone est en cours, React regroupe **toutes** les transitions : ne pas
+  mettre dans une transition une mise à jour qui doit être immédiate (fermer une modale,
+  naviguer). D'où `<RouterProvider useTransitions={false}>`.
 - Le reducer optimiste est une fonction pure testable, partagée avec le reducer réel si possible.
 
 ### Effets
@@ -164,8 +172,9 @@ Conventions de fichiers :
 - Ne pas ajouter `useMemo` / `useCallback` / `memo` par réflexe. Les utiliser seulement pour :
   une valeur de Context (éviter de re-rendre tous les consommateurs), une dépendance d'effet
   qui doit rester stable, ou un calcul mesuré comme coûteux.
-- `useTransition` / `startTransition` pour les mises à jour non urgentes (changement de jour)
-  afin de garder l'interface réactive.
+- Pas de `startTransition` pour le changement de jour : les routes n'ont pas de loader, et
+  `useDayEvents` affiche son propre état de chargement. Les navigations restent immédiates
+  (`useTransitions={false}`) pour ne jamais attendre une mutation optimiste en cours.
 - Listes : `key` stable issue des données (`event.id`), jamais l'index.
 
 ### Métadonnées de page

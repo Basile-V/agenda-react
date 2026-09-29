@@ -31,3 +31,33 @@
   box-shadow: var(--shadow-md);
   color: var(--color-danger);
 }
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4);
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+.addButton {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  width: 3.5rem;
+  height: 3.5rem;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  box-shadow: var(--shadow-lg);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}

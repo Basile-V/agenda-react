@@ -1,8 +1,8 @@
-import type { CalendarEvent } from '../../api/types';
 import { useElementSize } from '../../ui/useElementSize';
 import styles from './DayGrid.module.scss';
 import { EventBlock } from './EventBlock';
 import { DAY_END_HOUR, DAY_START_HOUR, layoutEvents } from './layout';
+import type { DisplayedEvent } from './useDayEvents';
 
 const HOURS = Array.from(
   { length: DAY_END_HOUR - DAY_START_HOUR + 1 },
@@ -10,11 +10,12 @@ const HOURS = Array.from(
 );
 
 type DayGridProps = {
-  events: CalendarEvent[];
+  events: readonly DisplayedEvent[];
   currentUserId: number;
+  onSelect: (event: DisplayedEvent) => void;
 };
 
-export function DayGrid({ events, currentUserId }: DayGridProps) {
+export function DayGrid({ events, currentUserId, onSelect }: DayGridProps) {
   // Only the events area is measured: the hour column sits beside it, so the whole measured
   // width is the kata's LargeurMax.
   const [eventsAreaRef, size] = useElementSize<HTMLDivElement>();
@@ -36,6 +37,7 @@ export function DayGrid({ events, currentUserId }: DayGridProps) {
             event={event}
             position={position}
             isOwn={event.ownerId === currentUserId}
+            onSelect={onSelect}
           />
         ))}
       </div>

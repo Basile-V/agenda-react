@@ -10,7 +10,7 @@ export function renderWithRouter(path: string) {
   const user = userEvent.setup();
   render(
     <AuthProvider>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} useTransitions={false} />
     </AuthProvider>,
   );
   return { router, user };

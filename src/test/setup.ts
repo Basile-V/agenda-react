@@ -9,6 +9,8 @@ import { server } from './server';
 // jsdom implements neither <dialog> modality nor ResizeObserver.
 HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
   this.open = true;
+  // Like browsers: focus the first focusable element of the dialog.
+  this.querySelector<HTMLElement>('input, select, textarea, button, [href], [tabindex]')?.focus();
 };
 HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
   if (!this.open) return;
