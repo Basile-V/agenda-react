@@ -9,28 +9,28 @@
   border-radius: var(--radius-md);
   font-weight: 600;
   transition: background-color 0.15s;
-}
 
-.button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .primary {
   background: var(--color-primary);
   color: var(--color-primary-contrast);
-}
 
-.primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
 }
 
 .ghost {
   background: transparent;
   color: var(--color-text);
   border-color: var(--color-border);
-}
 
-.ghost:hover:not(:disabled) {
-  background: var(--color-surface);
+  &:hover:not(:disabled) {
+    background: var(--color-surface);
+  }
 }

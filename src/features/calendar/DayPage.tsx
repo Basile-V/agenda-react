@@ -4,7 +4,7 @@ import { Spinner } from '../../ui/Spinner';
 import { useCurrentUser } from '../auth/useAuth';
 import { CalendarHeader } from './CalendarHeader';
 import { DayGrid } from './DayGrid';
-import styles from './DayPage.module.css';
+import styles from './DayPage.module.scss';
 import { formatDayTitle, isValidDateKey } from './time';
 import { TodayRedirect } from './TodayRedirect';
 import { useDayEvents } from './useDayEvents';

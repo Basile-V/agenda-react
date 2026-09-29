@@ -8,13 +8,13 @@
   border-radius: var(--radius-full);
   background: transparent;
   color: inherit;
-}
 
-.iconButton:hover:not(:disabled) {
-  background: var(--color-surface);
-}
+  &:hover:not(:disabled) {
+    background: var(--color-surface);
+  }
 
-.iconButton svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }

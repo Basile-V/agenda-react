@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import './styles/reset.css';
-import './styles/variables.css';
+import './styles/reset.scss';
+import './styles/variables.scss';
 
 async function enableMocking() {
   // Dead code in production builds: MODE is replaced at build time.

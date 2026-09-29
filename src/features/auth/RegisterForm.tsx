@@ -3,7 +3,7 @@ import { ApiError } from '../../api/client';
 import { getText } from '../../ui/formData';
 import { SubmitButton } from '../../ui/SubmitButton';
 import { TextField } from '../../ui/TextField';
-import styles from './AuthForm.module.css';
+import styles from './AuthForm.module.scss';
 import { useAuth } from './useAuth';
 
 const MIN_PASSWORD_LENGTH = 8;

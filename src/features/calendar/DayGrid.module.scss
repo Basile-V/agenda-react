@@ -14,13 +14,13 @@
   list-style: none;
   font-size: 0.75rem;
   color: var(--color-text-muted);
-}
 
-.hours li {
-  position: absolute;
-  top: calc(var(--index) / var(--hours) * 100%);
-  right: var(--space-2);
-  transform: translateY(-50%);
+  li {
+    position: absolute;
+    top: calc(var(--index) / var(--hours) * 100%);
+    right: var(--space-2);
+    transform: translateY(-50%);
+  }
 }
 
 .events {

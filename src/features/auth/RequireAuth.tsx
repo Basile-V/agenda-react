@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { Spinner } from '../../ui/Spinner';
-import styles from './RequireAuth.module.css';
+import styles from './RequireAuth.module.scss';
 import { useAuth } from './useAuth';
 
 /** Layout route: renders its children only once the user is known to be logged in. */

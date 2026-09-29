@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
 import { Tabs } from '../../ui/Tabs';
-import styles from './LoginPage.module.css';
+import styles from './LoginPage.module.scss';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 import { useAuth } from './useAuth';

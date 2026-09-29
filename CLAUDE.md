@@ -34,7 +34,8 @@ développeur front React**. Il refait le front Angular du dépôt voisin
   `noImplicitOverride`, `verbatimModuleSyntax`)
 - React 19, composants fonctions + hooks uniquement
 - `react-router` v8 en mode librairie (`createBrowserRouter`, `RouterProvider`)
-- CSS Modules + variables CSS, `<dialog>` natif pour les modales
+- Modules SCSS (`sass-embedded`, dépendance de dev) + variables CSS, `<dialog>` natif pour les
+  modales
 - Vitest + React Testing Library + `@testing-library/user-event` + MSW
 - ESLint flat config (`eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`,
   `typescript-eslint`) + Prettier
@@ -68,7 +69,7 @@ src/
                 EventDetailsDialog, useDayEvents, layout.ts, time.ts
     loading/    LoadingProvider, ServerWakeOverlay
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
-  styles/       variables.css, reset.css
+  styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
 ```
 
@@ -82,7 +83,7 @@ Règles de dépendance entre dossiers :
 
 Conventions de fichiers :
 
-- Un composant par fichier, `PascalCase.tsx`, avec son `PascalCase.module.css` à côté.
+- Un composant par fichier, `PascalCase.tsx`, avec son `PascalCase.module.scss` à côté.
 - Hooks : `useXxx.ts`. Fonctions pures : `camelCase.ts`.
 - Tests colocalisés : `Xxx.test.tsx` / `xxx.test.ts`.
 - Exports nommés uniquement (pas de `export default`), sauf si un outil l'exige.
@@ -194,8 +195,11 @@ Conventions de fichiers :
 
 ### Styles
 
-- CSS Modules (`styles.xxx`), classes en `camelCase`.
-- Couleurs, espacements, rayons, ombres en **variables CSS** dans `styles/variables.css`.
+- Modules SCSS (`styles.xxx`), classes en `camelCase`. SCSS pour l'imbrication (`&:hover`,
+  sélecteurs enfants) et les placeholders `%xxx` + `@extend` quand des règles se répètent.
+- Couleurs, espacements, rayons, ombres en **variables CSS** (`--xxx`) dans
+  `styles/variables.scss`, pas en variables Sass (`$xxx`) : elles restent modifiables à
+  l'exécution (thème sombre, valeurs venant de React).
 - Les positions calculées (top, height, left, width) passent par `style={{ … }}` ou des
   custom properties (`--top`, `--height`), le reste reste dans le CSS.
 - Pas de librairie CSS ni de `clsx` : concaténer les classes à la main.

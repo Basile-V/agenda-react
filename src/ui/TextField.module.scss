@@ -16,10 +16,10 @@
   border-radius: var(--radius-md);
   background: var(--color-bg);
   color: var(--color-text);
-}
 
-.input[aria-invalid='true'] {
-  border-color: var(--color-danger);
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
 }
 
 .error {

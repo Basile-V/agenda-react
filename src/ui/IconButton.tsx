@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import styles from './IconButton.module.css';
+import styles from './IconButton.module.scss';
 
 /** The icon is decorative: the accessible name comes from the required aria-label. */
 type IconButtonProps = ComponentProps<'button'> & { 'aria-label': string };

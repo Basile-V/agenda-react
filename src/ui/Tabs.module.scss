@@ -11,11 +11,11 @@
   background: none;
   color: var(--color-text-muted);
   font-weight: 600;
-}
 
-.tab[aria-selected='true'] {
-  border-bottom-color: var(--color-primary);
-  color: var(--color-primary);
+  &[aria-selected='true'] {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+  }
 }
 
 .panel {

@@ -1,6 +1,6 @@
 import type { CalendarEvent } from '../../api/types';
 import { useElementSize } from '../../ui/useElementSize';
-import styles from './DayGrid.module.css';
+import styles from './DayGrid.module.scss';
 import { EventBlock } from './EventBlock';
 import { DAY_END_HOUR, DAY_START_HOUR, layoutEvents } from './layout';
 

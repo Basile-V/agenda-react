@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { IconButton } from '../../ui/IconButton';
 import { ChevronLeftIcon, ChevronRightIcon, LogoutIcon } from '../../ui/icons';
 import { useAuth, useCurrentUser } from '../auth/useAuth';
-import styles from './CalendarHeader.module.css';
+import styles from './CalendarHeader.module.scss';
 import { addDays, formatDayTitle, toDateKey } from './time';
 
 export function CalendarHeader({ date }: { date: string }) {

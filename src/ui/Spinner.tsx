@@ -1,4 +1,4 @@
-import styles from './Spinner.module.css';
+import styles from './Spinner.module.scss';
 
 type SpinnerProps = {
   size?: 'small' | 'large';

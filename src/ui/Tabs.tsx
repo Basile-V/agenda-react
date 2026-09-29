@@ -1,5 +1,5 @@
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import styles from './Tabs.module.css';
+import styles from './Tabs.module.scss';
 
 type Tab = { id: string; label: string; panel: ReactNode };
 

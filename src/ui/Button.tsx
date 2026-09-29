@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import styles from './Button.module.css';
+import styles from './Button.module.scss';
 
 type ButtonProps = ComponentProps<'button'> & { variant?: 'primary' | 'ghost' };
 

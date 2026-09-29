@@ -42,7 +42,7 @@ crée, modifie et supprime des événements, avec une gestion fine des chevauche
 | UI | React 19 (fonctions + hooks) |
 | Routage | `react-router` v8 (mode librairie, `createBrowserRouter`) |
 | État | `useState` / `useReducer`, Context pour l'auth et le suivi des requêtes lentes |
-| Styles | CSS Modules + variables CSS |
+| Styles | Modules SCSS + variables CSS (thème modifiable à l'exécution) |
 | HTTP | `fetch` natif, encapsulé dans `apiFetch` |
 | Tests | Vitest, React Testing Library, `user-event`, MSW |
 | Qualité | ESLint (flat config, `react-hooks`), Prettier |
@@ -117,7 +117,7 @@ src/
                 layout.ts, time.ts
     loading/    LoadingProvider, ServerWakeOverlay
   ui/           composants génériques : Button, IconButton, Dialog, TextField, Tabs, Spinner, icons
-  styles/       variables CSS, reset
+  styles/       variables CSS (variables.scss), reset
 ```
 
 - La logique métier (layout, dates, heures) est faite de **fonctions pures sans React**,

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { CalendarEvent } from '../../api/types';
-import styles from './EventBlock.module.css';
+import styles from './EventBlock.module.scss';
 
 type EventBlockProps = {
   event: CalendarEvent;
