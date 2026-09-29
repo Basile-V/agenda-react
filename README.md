@@ -144,13 +144,17 @@ Règles imposées (LargeurMax = largeur du conteneur) :
    événements d'un cluster partagent le même nombre de colonnes.
 3. **Colonnes** : chaque événement va dans la première colonne libre (attribution gloutonne).
 4. **Largeur** : tous les événements d'un cluster ont la même largeur,
-   `(LargeurMax − marge) / nombre de colonnes`. Pas d'extension sur les colonnes libres (comme
+   `LargeurMax / nombre de colonnes`. LargeurMax est la largeur de la zone des événements,
+   mesurée par `ResizeObserver` : la colonne des heures est à côté, pas en marge à déduire. Pas d'extension sur les colonnes libres (comme
    le fait le front Angular) : elle donnerait des largeurs différentes à deux événements qui se
    chevauchent, ce qui viole la règle 1.
 
 Avec trois événements qui se chevauchent deux à deux, la règle 3 ne peut pas tenir en même temps
 que la règle 1 (chacun fait un tiers) : la règle 1 prime, et la règle 3 est garantie pour les
 clusters à deux colonnes.
+
+Les horaires sont bornés à la grille 09:00 → 21:00 ; un événement entièrement hors de cette
+plage n'est pas placé sur la grille.
 
 ```
         colonne 1   colonne 2
