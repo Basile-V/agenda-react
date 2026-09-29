@@ -1,7 +1,11 @@
+import { RouterProvider } from 'react-router';
+import { AuthProvider } from './features/auth/AuthProvider';
+import { router } from './router';
+
 export function App() {
   return (
-    <main>
-      <h1>Agenda</h1>
-    </main>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }

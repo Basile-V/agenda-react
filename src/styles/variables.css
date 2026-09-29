@@ -6,9 +6,12 @@
   --color-text: #1f2328;
   --color-text-muted: #59636e;
   --color-border: #d1d9e0;
+  --color-border-strong: #818b98;
   --color-primary: #3a5bd9;
+  --color-primary-hover: #2f4bb8;
   --color-primary-contrast: #ffffff;
   --color-danger: #c62828;
+  --color-danger-surface: #fdecea;
   --color-focus: #3a5bd9;
   --color-event-bg: #e3e9fc;
   --color-event-border: #3a5bd9;
