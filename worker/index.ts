@@ -25,9 +25,14 @@ export default {
     // and reject the request as a CORS violation.
     headers.delete('Origin');
 
+    // Path and query set on the backend URL, never resolved against it: as a relative
+    // reference, /backend//evil.example would send the visitor's cookies to evil.example.
+    const target = new URL(env.API_ORIGIN);
+    target.pathname = url.pathname.slice(PREFIX.length);
+    target.search = url.search;
+
     // Method, headers (cookies, X-XSRF-TOKEN) and body copied explicitly onto the backend URL.
-    const backendPath = url.pathname.slice(PREFIX.length) || '/';
-    const response = await fetch(new URL(backendPath + url.search, env.API_ORIGIN), {
+    const response = await fetch(target, {
       method: request.method,
       headers,
       body: BODYLESS_METHODS.has(request.method) ? undefined : await request.arrayBuffer(),

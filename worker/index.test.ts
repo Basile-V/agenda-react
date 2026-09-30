@@ -55,6 +55,20 @@ describe('request', () => {
     );
     expect(received[0]?.headers.has('Origin')).toBe(false);
   });
+
+  // The visitor's cookies travel with the request: they must never leave for another host.
+  test.each([
+    ['//evil.example/steal?x=1', 'https://backend.test//evil.example/steal?x=1'],
+    ['/%2F%2Fevil.example/steal', 'https://backend.test/%2F%2Fevil.example/steal'],
+    ['@evil.example/steal', 'https://backend.test/@evil.example/steal'],
+  ])('only ever forwards to the backend: /backend%s', async (path, expected) => {
+    const received = captureBackendRequests();
+    await worker.fetch(
+      new Request(`${APP}${path}`, { headers: { Cookie: 'access_token=abc' } }),
+      env,
+    );
+    expect(received.map((request) => request.url)).toEqual([expected]);
+  });
 });
 
 describe('response', () => {
