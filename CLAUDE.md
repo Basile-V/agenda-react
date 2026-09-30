@@ -39,7 +39,7 @@ développeur front React**. Il refait le front Angular du dépôt voisin
 - Vitest + React Testing Library + `@testing-library/user-event` + MSW
 - ESLint flat config (`eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`,
   `typescript-eslint`) + Prettier
-- Déploiement : Cloudflare Workers Static Assets (`wrangler.json`)
+- Déploiement : Cloudflare Workers (`wrangler.json`) : fichiers statiques + proxy `/api/*`
 
 ## Commandes
 
@@ -71,6 +71,7 @@ src/
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
   styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
+worker/         proxy Cloudflare /api/* → backend (tsconfig.worker.json, API web standard)
 ```
 
 Règles de dépendance entre dossiers :
@@ -80,6 +81,8 @@ Règles de dépendance entre dossiers :
   autre feature que via son hook public (ex. `useAuth` depuis `features/auth`).
 - `api/` ne dépend pas de React : il expose des abonnements (`onSessionExpired`,
   `subscribeToSlowRequests`) que React lit (effet, `useSyncExternalStore`).
+- `worker/` ne dépend de rien d'autre dans le dépôt et n'utilise que les API web standard
+  (`Request`, `Response`, `fetch`).
 - `layout.ts` et `time.ts` sont **purs** : aucun import React, aucun accès au DOM.
 
 Conventions de fichiers :
@@ -239,8 +242,10 @@ Conventions de fichiers :
   compréhensible, jamais une erreur brute.
 - URL de base : `import.meta.env.VITE_API_BASE_URL` (typée dans `vite-env.d.ts`).
 
-Les changements nécessaires côté backend (CORS multi-origines, jeton CSRF entre domaines) se
-font dans le dépôt `agenda`, pas ici : les signaler s'ils ne sont pas faits.
+En production, l'API est appelée sur le domaine du site : le Worker `worker/index.ts` relaie
+`/api/*` vers le backend (`API_ORIGIN` dans `wrangler.json`), d'où `VITE_API_BASE_URL` vide dans
+`.env.production`. Ça évite CORS, les cookies tiers et le jeton CSRF illisible entre domaines,
+sans toucher au backend. Tout changement côté backend se fait dans le dépôt `agenda`, pas ici.
 
 ## Tests
 
