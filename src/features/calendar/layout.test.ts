@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { DAY_END_HOUR, DAY_START_HOUR, layoutEvents, type PositionedEvent } from './layout';
+import {
+  DAY_END_HOUR,
+  DAY_START_HOUR,
+  isInDisplayedRange,
+  layoutEvents,
+  type PositionedEvent,
+} from './layout';
 
 type TestEvent = { id: number; start: string; duration: number };
 
@@ -110,6 +116,26 @@ describe('out-of-range times are clamped to the grid', () => {
     const layout = layoutEvents([ev(1, '07:00', 90), ev(2, '09:00', 60)], GRID);
     expect(layout).toHaveLength(1);
     expect(box(layout, 2)).toMatchObject({ left: 0, width: 600 });
+  });
+});
+
+describe('isInDisplayedRange', () => {
+  test.each([
+    ['07:00', 60, false],
+    ['08:00', 60, false], // ends exactly when the grid starts
+    ['08:30', 60, true],
+    ['09:00', 30, true],
+    ['20:59', 1, true],
+    ['21:00', 30, false], // starts exactly when the grid ends
+    ['23:30', 120, false], // past midnight: still not on this day's grid
+  ])('%s for %i min → %s', (start, duration, expected) => {
+    expect(isInDisplayedRange(ev(1, start, duration))).toBe(expected);
+  });
+
+  test('agrees with layoutEvents: an event is laid out if and only if it is in range', () => {
+    const events = [ev(1, '07:00', 60), ev(2, '08:30', 60), ev(3, '20:59', 1), ev(4, '21:00', 5)];
+    const laidOut = layoutEvents(events, GRID).map(({ event }) => event.id);
+    expect(laidOut).toEqual(events.filter(isInDisplayedRange).map((event) => event.id));
   });
 });
 

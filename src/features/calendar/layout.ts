@@ -19,6 +19,12 @@ export type PositionedEvent<T extends Schedulable> = {
 
 type Slot<T> = { event: T; start: number; end: number; column: number };
 
+/** Whether any part of the event falls inside the grid: the others are not laid out. */
+export function isInDisplayedRange({ start, duration }: Omit<Schedulable, 'id'>): boolean {
+  const startMinutes = parseTimeToMinutes(start);
+  return startMinutes < DAY_END && startMinutes + duration > DAY_START;
+}
+
 /**
  * Positions the events of a day inside a `width` × `height` area covering DAY_START → DAY_END.
  *
@@ -34,11 +40,11 @@ export function layoutEvents<T extends Schedulable>(
   const pxPerMinute = height / (DAY_END - DAY_START);
 
   const visible = events
+    .filter(isInDisplayedRange)
     .map((event) => {
       const start = parseTimeToMinutes(event.start);
       return { event, start, end: start + event.duration };
     })
-    .filter(({ start, end }) => start < DAY_END && end > DAY_START)
     .sort((a, b) => a.start - b.start || b.end - a.end || a.event.id - b.event.id);
 
   const result: PositionedEvent<T>[] = [];

@@ -149,6 +149,28 @@ describe('create', () => {
     expect(screen.queryByText('Demain')).toBeNull();
   });
 
+  test('an event created outside 09:00 → 21:00 shows up in the out-of-range list', async () => {
+    const release = holdNext('post', '/api/events');
+    const { user } = await renderDay();
+    await user.click(screen.getByRole('button', { name: 'Nouvel événement' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nouvel événement' });
+    await user.type(within(dialog).getByLabelText('Titre'), 'Footing');
+    await user.type(within(dialog).getByLabelText('Heure de début'), '07:00');
+    await user.click(within(dialog).getByRole('button', { name: 'Ajouter' }));
+
+    // Optimistic: listed at once, but not openable before the server gave it an id.
+    const outside = await screen.findByRole('region', {
+      name: 'Événements hors de la plage affichée',
+    });
+    expect(within(outside).getByRole('button', { name: '07:00 Footing' })).toBeDisabled();
+
+    release();
+    await waitFor(() =>
+      expect(within(outside).getByRole('button', { name: '07:00 Footing' })).toBeEnabled(),
+    );
+    expect(eventBlock(6)).toBeNull();
+  });
+
   test('when the server refuses, the event goes away and the reason is shown', async () => {
     failNext('post', '/api/events', 500);
     const { user } = await renderDay();

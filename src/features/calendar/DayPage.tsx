@@ -11,6 +11,7 @@ import { DayGrid } from './DayGrid';
 import styles from './DayPage.module.scss';
 import { EventDetailsDialog } from './EventDetailsDialog';
 import { EventFormDialog } from './EventFormDialog';
+import { OutOfRangeEvents } from './OutOfRangeEvents';
 import { formatDayTitle, isValidDateKey } from './time';
 import { TodayRedirect } from './TodayRedirect';
 import { useDayEvents } from './useDayEvents';
@@ -34,6 +35,8 @@ function Day({ date }: { date: string }) {
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
   const closeDialog = () => setDialog(null);
+  const showDetails = (event: CalendarEvent) => setDialog({ type: 'details', event });
+  const events = day.status === 'success' ? day.events : [];
 
   // Optimistic: the dialog closes at once and the grid shows the change right away. If the
   // server refuses it, the change rolls back by itself and we explain why.
@@ -71,12 +74,9 @@ function Day({ date }: { date: string }) {
           </IconButton>
         </div>
       )}
+      <OutOfRangeEvents events={events} onSelect={showDetails} />
       <main className={styles.main} aria-busy={day.status === 'loading'}>
-        <DayGrid
-          events={day.status === 'success' ? day.events : []}
-          currentUserId={user.id}
-          onSelect={(event) => setDialog({ type: 'details', event })}
-        />
+        <DayGrid events={events} currentUserId={user.id} onSelect={showDetails} />
         {day.status === 'loading' && (
           <div className={styles.overlay}>
             <Spinner label="Chargement des événements…" />

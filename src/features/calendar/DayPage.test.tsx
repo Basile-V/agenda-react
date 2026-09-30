@@ -218,3 +218,38 @@ describe('events', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 });
+
+describe('events outside 09:00 → 21:00', () => {
+  const OUTSIDE = 'Événements hors de la plage affichée';
+
+  test('are listed above the grid instead of silently hidden, and open like the others', async () => {
+    db.events.push(
+      {
+        id: 13,
+        title: 'Footing',
+        date: DAY,
+        start: '07:00',
+        duration: 45,
+        ownerId: 2,
+        isPublic: false,
+      },
+      { id: 14, date: DAY, start: '21:30', duration: 30, ownerId: 2, isPublic: false },
+    );
+    const { user } = await renderDay();
+
+    const outside = screen.getByRole('region', { name: OUTSIDE });
+    expect(outside).toHaveTextContent('Hors de la plage 09:00 – 21:00');
+    expect(within(outside).getByRole('button', { name: '21:30 Événement 14' })).toBeInTheDocument();
+    expect(eventBlock(13)).toBeNull();
+
+    await user.click(within(outside).getByRole('button', { name: '07:00 Footing' }));
+    const dialog = screen.getByRole('dialog', { name: 'Footing' });
+    expect(dialog).toHaveTextContent('07:00 – 07:45');
+    expect(within(dialog).getByRole('button', { name: 'Modifier' })).toBeInTheDocument();
+  });
+
+  test('the list is absent when every event fits the grid', async () => {
+    await renderDay();
+    expect(screen.queryByRole('region', { name: OUTSIDE })).toBeNull();
+  });
+});
