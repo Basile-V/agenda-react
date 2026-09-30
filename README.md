@@ -3,7 +3,7 @@
 Vue « jour » d'un agenda : un calendrier écrit **from scratch** en React 19, qui affiche, crée,
 modifie et supprime des événements, et répartit la largeur entre ceux qui se chevauchent.
 
-- **Démo** : _à venir_ (Cloudflare Workers)
+- **Démo** : [agenda-react.vandervalle-basile.workers.dev](https://agenda-react.vandervalle-basile.workers.dev) (Cloudflare Workers)
 - **Comptes de démo** : `basile` / `demo1234`
 - **Backend** : API Spring Boot du dépôt [Basile-V/agenda](https://github.com/Basile-V/agenda)
   (dossier `Backend/`), hébergée sur Render
