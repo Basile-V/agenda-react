@@ -57,6 +57,18 @@ describe('getEvents', () => {
       'wrong time format',
       [{ id: 1, date: DAY, start: '10:00:00', duration: 30, ownerId: 2, isPublic: false }],
     ],
+    [
+      'impossible time',
+      [{ id: 1, date: DAY, start: '24:00', duration: 30, ownerId: 2, isPublic: false }],
+    ],
+    [
+      'empty duration',
+      [{ id: 1, date: DAY, start: '10:00', duration: 0, ownerId: 2, isPublic: false }],
+    ],
+    [
+      'fractional duration',
+      [{ id: 1, date: DAY, start: '10:00', duration: 30.5, ownerId: 2, isPublic: false }],
+    ],
   ])('rejects an unexpected response (%s)', async (_, body) => {
     server.use(http.get(apiUrl('/api/events'), () => HttpResponse.json(body)));
     await expect(getEvents(DAY)).rejects.toMatchObject({

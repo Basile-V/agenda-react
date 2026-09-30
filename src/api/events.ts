@@ -2,7 +2,8 @@ import { apiFetch, isRecord, unexpectedResponse } from './client';
 import type { CalendarEvent, EventPayload } from './types';
 
 const DATE_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
-const TIME_FORMAT = /^\d{2}:\d{2}$/;
+// As strict as the calendar, which throws on a time it cannot place.
+const TIME_FORMAT = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 function parseEvent(data: unknown): CalendarEvent {
   if (
@@ -14,6 +15,8 @@ function parseEvent(data: unknown): CalendarEvent {
     typeof data.start === 'string' &&
     TIME_FORMAT.test(data.start) &&
     typeof data.duration === 'number' &&
+    Number.isInteger(data.duration) &&
+    data.duration > 0 &&
     typeof data.ownerId === 'number' &&
     typeof data.isPublic === 'boolean'
   ) {
