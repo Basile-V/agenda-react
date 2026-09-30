@@ -71,7 +71,7 @@ src/
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
   styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
-worker/         proxy Cloudflare /api/* → backend (tsconfig.worker.json, API web standard)
+worker/         proxy Cloudflare /backend/* → backend (tsconfig.worker.json, API web standard)
 ```
 
 Règles de dépendance entre dossiers :
@@ -243,8 +243,11 @@ Conventions de fichiers :
 - URL de base : `import.meta.env.VITE_API_BASE_URL` (typée dans `vite-env.d.ts`).
 
 En production, l'API est appelée sur le domaine du site : le Worker `worker/index.ts` relaie
-`/api/*` vers le backend (`API_ORIGIN` dans `wrangler.json`), d'où `VITE_API_BASE_URL` vide dans
-`.env.production`. Ça évite CORS, les cookies tiers et le jeton CSRF illisible entre domaines,
+`/backend/*` vers le backend (`API_ORIGIN` dans `wrangler.json`), d'où `VITE_API_BASE_URL=/backend`
+dans `.env.production`. Préfixe `/backend` et non `/api` : EasyPrivacy (uBlock) bloque
+`||workers.dev/api/event`. Le Worker retire le préfixe et réécrit le `Path` des `Set-Cookie`.
+Il n'exporte que son handler (le runtime refuse tout autre export du module principal) : les
+utilitaires vont dans `worker/paths.ts`. Ça évite CORS, les cookies tiers et le jeton CSRF illisible entre domaines,
 sans toucher au backend. Tout changement côté backend se fait dans le dépôt `agenda`, pas ici.
 
 ## Tests

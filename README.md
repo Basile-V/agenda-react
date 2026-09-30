@@ -29,7 +29,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 223 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
+- **Testé** : 227 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
   des assertions dédiées. TypeScript `strict`, ESLint avec règles typées.
 
 C'est la réécriture en React d'un front Angular existant (même backend, mêmes fonctionnalités).
@@ -113,10 +113,16 @@ Le front (Cloudflare) et l'API (Render) sont sur deux domaines différents. Appe
 l'API poserait trois problèmes : CORS, des cookies de session **tiers** (bloqués par Safari et
 de plus en plus de navigateurs), et un cookie CSRF que le JavaScript du front ne peut pas lire.
 
-Le Worker qui sert le site relaie donc `/api/*` vers Render
-([`worker/index.ts`](worker/index.ts), une vingtaine de lignes, testé). Pour le navigateur, tout
-est sur le même domaine : pas de CORS, des cookies du site, un jeton CSRF lisible. Aucune
-modification du backend n'a été nécessaire.
+Le Worker qui sert le site relaie donc `/backend/*` vers Render
+([`worker/index.ts`](worker/index.ts), testé). Pour le navigateur, tout est sur le même domaine :
+pas de CORS, des cookies du site, un jeton CSRF lisible. Aucune modification du backend n'a été
+nécessaire.
+
+Pourquoi `/backend` et pas `/api` : EasyPrivacy, activée par défaut dans uBlock Origin, contient
+la règle `||workers.dev/api/event`, qui bloquait `GET /api/events` chez les visiteurs équipés d'un
+bloqueur. Le Worker retire le préfixe avant de transmettre, et réécrit le chemin des cookies
+limités à un chemin du backend (`refresh_token`, `Path=/api/auth` → `/backend/api/auth`) pour
+que le navigateur les renvoie.
 
 ## Algorithme de chevauchement
 
@@ -175,7 +181,7 @@ src/
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, ThemeToggle, icons
   styles/       variables CSS, reset
   test/         faux backend MSW, helpers de rendu, ResizeObserver de test
-worker/         proxy Cloudflare : /api/* relayé vers le backend (même origine)
+worker/         proxy Cloudflare : /backend/* relayé vers le backend (même origine)
 ```
 
 - `ui/` ne connaît ni l'API ni le domaine ; `api/` ne dépend pas de React.
@@ -219,8 +225,8 @@ backend que les tests (sessions, CSRF, visibilité). Se connecter avec `basile` 
 
 | Variable | Rôle | Valeur |
 |---|---|---|
-| `VITE_API_BASE_URL` | URL de base de l'API | `.env` en dev (`http://localhost:8080`) ; vide dans `.env.production` : l'API est appelée sur le domaine du site, via le proxy |
-| `API_ORIGIN` | Backend vers lequel le Worker relaie `/api/*` | `https://agenda-o5su.onrender.com` (`vars` de `wrangler.json`) |
+| `VITE_API_BASE_URL` | URL de base de l'API | `.env` en dev (`http://localhost:8080`) ; `/backend` dans `.env.production` : l'API est appelée sur le domaine du site, via le proxy |
+| `API_ORIGIN` | Backend vers lequel le Worker relaie `/backend/*` | `https://agenda-o5su.onrender.com` (`vars` de `wrangler.json`) |
 
 ## Tests
 
@@ -248,7 +254,7 @@ Cloudflare Workers, configuré dans [`wrangler.json`](wrangler.json) :
 - les fichiers de `dist/` sont servis directement, et toute route de l'application renvoie
   `index.html` (`not_found_handling: "single-page-application"`, sans fichier `_redirects`, qui
   entrerait en conflit) ;
-- `/api/*` passe d'abord par le Worker (`run_worker_first`), qui relaie vers le backend.
+- `/backend/*` passe d'abord par le Worker (`run_worker_first`), qui relaie vers le backend.
 
 ```bash
 npm run build
