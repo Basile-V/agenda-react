@@ -103,8 +103,14 @@ describe('addDays', () => {
 
 describe('formatDayTitle', () => {
   test('long French date, weekday first', () => {
-    expect(formatDayTitle('2026-09-29')).toBe('mardi 29 septembre 2026');
-    expect(formatDayTitle('2027-01-01')).toBe('vendredi 1 janvier 2027');
+    expect(formatDayTitle('2026-09-29', 'fr')).toBe('mardi 29 septembre 2026');
+    expect(formatDayTitle('2027-01-01', 'fr')).toBe('vendredi 1 janvier 2027');
+  });
+
+  test('long English date, weekday first', () => {
+    // British English puts a comma after the weekday or not, depending on the ICU version.
+    expect(formatDayTitle('2026-09-29', 'en')).toMatch(/^Tuesday,? 29 September 2026$/);
+    expect(formatDayTitle('2027-01-01', 'en')).toMatch(/^Friday,? 1 January 2027$/);
   });
 });
 

@@ -9,7 +9,8 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? 'github' : 'list',
-  use: { baseURL: `http://localhost:${PORT}`, trace: 'on-first-retry' },
+  // French browser: the app follows the browser's language until the user picks one.
+  use: { baseURL: `http://localhost:${PORT}`, trace: 'on-first-retry', locale: 'fr-FR' },
   projects: [{ name: 'chromium', use: devices['Desktop Chrome'] }],
   // The real app in a real browser, on the MSW mock backend: no server to start or seed.
   webServer: {

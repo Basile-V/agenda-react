@@ -76,7 +76,10 @@ src/
     calendar/   DayPage, CalendarHeader, DayGrid, EventBlock, EventFormDialog,
                 EventDetailsDialog, OutOfRangeEvents, useDayEvents, layout.ts, time.ts
     loading/    useIsWaitingForServer, ServerWakeOverlay
-  ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
+  i18n/         locale.ts (langue courante, hors React), messages.ts (dictionnaires fr / en),
+                useLocale.ts (useLocale, useMessages)
+  ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, ThemeToggle,
+                LanguageToggle, icons.tsx
   styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
 worker/         proxy Cloudflare /backend/* → backend (tsconfig.worker.json, API web standard)
@@ -86,6 +89,8 @@ e2e/            tests Playwright (mesures dans un vrai navigateur : règles du k
 Règles de dépendance entre dossiers :
 
 - `ui/` ne connaît **ni** l'API **ni** le domaine (pas d'import depuis `api/` ou `features/`).
+- `i18n/` ne dépend de rien d'autre ; tout le monde peut l'importer. `locale.ts` et `messages.ts`
+  n'importent pas React (`api/` et `time.ts` s'en servent), seul `useLocale.ts` le fait.
 - `features/*` peut importer `ui/`, `api/` et ses propres fichiers. Un feature n'importe un
   autre feature que via son hook public (ex. `useAuth` depuis `features/auth`).
 - `api/` ne dépend pas de React : il expose des abonnements (`onSessionExpired`,
@@ -132,7 +137,8 @@ Conventions de fichiers :
 - Lire un contexte avec `use(AuthContext)` (peut être appelé conditionnellement), encapsulé
   dans un hook (`useAuth`) qui lève une erreur explicite hors du provider.
 - Seul l'utilisateur courant va en Context. Le compteur de requêtes lentes vit dans `api/` et se
-  lit avec `useSyncExternalStore` (pas de provider). Tout le reste
+  lit avec `useSyncExternalStore` (pas de provider) ; de même la langue, dans `i18n/locale.ts`
+  (`<html lang>` fait foi, posé par le script inline d'`index.html`). Tout le reste
   reste local (état au plus près de son usage, remonté seulement si nécessaire).
 
 ### Formulaires et actions
@@ -286,7 +292,10 @@ sans toucher au backend. Tout changement côté backend se fait dans le dépôt 
 - Pas de `console.log` laissé dans le code.
 - Commentaires rares : expliquer le **pourquoi** (règle du kata, contournement navigateur),
   pas le quoi.
-- Textes de l'interface en français, code (identifiants, commits) en anglais.
+- Textes de l'interface en français et en anglais, **uniquement** dans `i18n/messages.ts` (le
+  dictionnaire français est la référence typée) : aucun texte en dur dans un composant. Dans un
+  composant : `useMessages()` ; hors React : `getMessages()`. Les tests tournent en français (langue
+  par défaut). Code (identifiants, commits) en anglais.
 
 ## Plugins Claude Code
 

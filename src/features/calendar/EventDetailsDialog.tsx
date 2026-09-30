@@ -1,4 +1,5 @@
 import type { CalendarEvent } from '../../api/types';
+import { useLocale, useMessages } from '../../i18n/useLocale';
 import { Button } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
 import { IconButton } from '../../ui/IconButton';
@@ -21,40 +22,40 @@ export function EventDetailsDialog({
   onDelete,
   onClose,
 }: EventDetailsDialogProps) {
+  const locale = useLocale();
+  const t = useMessages().calendar;
   const end = formatTime(parseTimeToMinutes(event.start) + event.duration);
 
   return (
-    <Dialog title={event.title ?? `Événement #${event.id}`} onClose={onClose}>
+    <Dialog title={event.title ?? t.untitledEvent(`#${event.id}`)} onClose={onClose}>
       <dl className={styles.details}>
-        <dt>Date</dt>
+        <dt>{t.date}</dt>
         <dd>
-          <time dateTime={event.date}>{formatDayTitle(event.date)}</time>
+          <time dateTime={event.date}>{formatDayTitle(event.date, locale)}</time>
         </dd>
-        <dt>Horaire</dt>
+        <dt>{t.schedule}</dt>
         <dd>
           <time>{event.start}</time> – <time>{end}</time>
         </dd>
-        <dt>Durée</dt>
-        <dd>{event.duration} minutes</dd>
-        <dt>Visibilité</dt>
-        <dd>{event.isPublic ? 'Public' : 'Privé'}</dd>
+        <dt>{t.duration}</dt>
+        <dd>{t.minutes(event.duration)}</dd>
+        <dt>{t.visibility}</dt>
+        <dd>{event.isPublic ? t.public : t.private}</dd>
       </dl>
-      {!canEdit && (
-        <p className={styles.readOnly}>Événement d'un autre utilisateur, en lecture seule.</p>
-      )}
+      {!canEdit && <p className={styles.readOnly}>{t.readOnly}</p>}
       <div className={styles.actions}>
         {canEdit && (
           <>
-            <IconButton aria-label="Modifier" onClick={onEdit}>
+            <IconButton aria-label={t.edit} onClick={onEdit}>
               <EditIcon />
             </IconButton>
-            <IconButton aria-label="Supprimer" className={styles.delete} onClick={onDelete}>
+            <IconButton aria-label={t.delete} className={styles.delete} onClick={onDelete}>
               <DeleteIcon />
             </IconButton>
           </>
         )}
         <Button onClick={onClose} className={styles.close}>
-          Fermer
+          {t.close}
         </Button>
       </div>
     </Dialog>

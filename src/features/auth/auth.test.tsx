@@ -19,7 +19,7 @@ function registerPanel() {
 }
 
 async function findDayPage(date: string) {
-  return screen.findByRole('heading', { level: 1, name: formatDayTitle(date) });
+  return screen.findByRole('heading', { level: 1, name: formatDayTitle(date, 'fr') });
 }
 
 describe('route protection', () => {
@@ -140,6 +140,18 @@ describe('login', () => {
     expect(await loginPanel().findByRole('alert')).toHaveTextContent('Identifiants invalides');
     expect(loginPanel().getByRole('textbox', { name: "Nom d'utilisateur" })).toHaveValue('admin');
     expect(loginPanel().getByLabelText('Mot de passe')).toHaveValue('');
+  });
+
+  test('in English, wrong credentials are explained in English', async () => {
+    const { user } = renderWithRouter('/login');
+    await user.click(await screen.findByRole('button', { name: 'Switch to English' }));
+    const panel = within(screen.getByRole('tabpanel', { name: 'Log in' }));
+    await user.type(panel.getByLabelText('Username'), 'admin');
+    await user.type(panel.getByLabelText('Password'), 'mauvais');
+    await user.click(panel.getByRole('button', { name: 'Log in' }));
+
+    expect(await panel.findByRole('alert')).toHaveTextContent('Invalid credentials');
+    expect(document.title).toBe('Log in · Agenda');
   });
 
   test('validates the fields before calling the server', async () => {

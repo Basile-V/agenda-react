@@ -1,5 +1,6 @@
 import { useActionState } from 'react';
 import { ApiError } from '../../api/client';
+import { useMessages } from '../../i18n/useLocale';
 import { getText } from '../../ui/formData';
 import { SubmitButton } from '../../ui/SubmitButton';
 import { TextField } from '../../ui/TextField';
@@ -17,6 +18,7 @@ const initialState: RegisterState = { values: { username: '', displayName: '' },
 
 export function RegisterForm() {
   const { register } = useAuth();
+  const t = useMessages().auth;
 
   async function registerAction(_: RegisterState, formData: FormData): Promise<RegisterState> {
     const username = getText(formData, 'username').trim();
@@ -24,10 +26,10 @@ export function RegisterForm() {
     const password = getText(formData, 'password');
     const values = { username, displayName };
     const errors: RegisterState['errors'] = {};
-    if (!username) errors.username = "Le nom d'utilisateur est requis";
-    if (!displayName) errors.displayName = 'Le nom affiché est requis';
+    if (!username) errors.username = t.usernameRequired;
+    if (!displayName) errors.displayName = t.displayNameRequired;
     if (password.length < MIN_PASSWORD_LENGTH) {
-      errors.password = `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères`;
+      errors.password = t.passwordTooShort(MIN_PASSWORD_LENGTH);
     }
     if (Object.keys(errors).length > 0) return { values, errors };
 
@@ -37,9 +39,9 @@ export function RegisterForm() {
     } catch (error) {
       if (error instanceof ApiError && error.status === 400) {
         // The backend's only functional 400 here: the username is taken.
-        return { values, errors: { username: error.message } };
+        return { values, errors: { username: t.usernameTaken } };
       }
-      const message = error instanceof ApiError ? error.message : 'Inscription impossible.';
+      const message = error instanceof ApiError ? error.message : t.registerFailed;
       return { values, errors: { form: message } };
     }
   }
@@ -49,7 +51,7 @@ export function RegisterForm() {
   return (
     <form action={formAction} noValidate className={styles.form}>
       <TextField
-        label="Nom d'utilisateur"
+        label={t.username}
         name="username"
         autoComplete="username"
         required
@@ -57,7 +59,7 @@ export function RegisterForm() {
         error={state.errors.username}
       />
       <TextField
-        label="Nom affiché"
+        label={t.displayName}
         name="displayName"
         autoComplete="name"
         required
@@ -65,7 +67,7 @@ export function RegisterForm() {
         error={state.errors.displayName}
       />
       <TextField
-        label="Mot de passe"
+        label={t.password}
         name="password"
         type="password"
         autoComplete="new-password"
@@ -78,7 +80,7 @@ export function RegisterForm() {
           {state.errors.form}
         </p>
       )}
-      <SubmitButton>Créer mon compte</SubmitButton>
+      <SubmitButton>{t.submitRegister}</SubmitButton>
     </form>
   );
 }

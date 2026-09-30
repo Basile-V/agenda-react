@@ -10,6 +10,8 @@
   position: fixed;
   top: var(--space-3);
   right: var(--space-3);
+  display: flex;
+  gap: var(--space-1);
 }
 
 .card {

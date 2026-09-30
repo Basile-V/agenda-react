@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import type { CalendarEvent, EventPayload } from '../../api/types';
+import { useLocale, useMessages } from '../../i18n/useLocale';
 import { Button } from '../../ui/Button';
 import { IconButton } from '../../ui/IconButton';
 import { AddIcon, CloseIcon } from '../../ui/icons';
@@ -42,6 +43,9 @@ type OpenDialog =
 function Day({ date, mutationError, onMutationError }: DayProps) {
   const user = useCurrentUser();
   const day = useDayEvents(date);
+  const locale = useLocale();
+  const messages = useMessages();
+  const t = messages.calendar;
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const closeDialog = () => setDialog(null);
   const showDetails = (event: CalendarEvent) => setDialog({ type: 'details', event });
@@ -58,27 +62,27 @@ function Day({ date, mutationError, onMutationError }: DayProps) {
 
   function create(payload: EventPayload) {
     closeDialog();
-    run(day.create(payload, user.id), "L'événement n'a pas pu être créé.");
+    run(day.create(payload, user.id), t.createFailed);
   }
 
   function update(event: CalendarEvent, payload: EventPayload) {
     closeDialog();
-    run(day.update(event, payload), "L'événement n'a pas pu être modifié.");
+    run(day.update(event, payload), t.updateFailed);
   }
 
   function remove(event: CalendarEvent) {
     closeDialog();
-    run(day.remove(event.id), "L'événement n'a pas pu être supprimé.");
+    run(day.remove(event.id), t.deleteFailed);
   }
 
   return (
     <div className={styles.page}>
-      <title>{`${formatDayTitle(date)} · Agenda`}</title>
+      <title>{`${formatDayTitle(date, locale)} · Agenda`}</title>
       <CalendarHeader date={date} />
       {mutationError && (
         <div role="alert" className={styles.banner}>
           <p>{mutationError}</p>
-          <IconButton aria-label="Masquer le message" onClick={() => onMutationError(null)}>
+          <IconButton aria-label={t.dismissMessage} onClick={() => onMutationError(null)}>
             <CloseIcon />
           </IconButton>
         </div>
@@ -88,20 +92,20 @@ function Day({ date, mutationError, onMutationError }: DayProps) {
         <DayGrid events={events} currentUserId={user.id} onSelect={showDetails} />
         {day.status === 'loading' && (
           <div className={styles.overlay}>
-            <Spinner label="Chargement des événements…" />
+            <Spinner label={t.loadingEvents} />
           </div>
         )}
         {day.status === 'error' && (
           <div className={styles.overlay}>
             <div role="alert" className={styles.error}>
               <p>{day.message}</p>
-              <Button onClick={day.retry}>Réessayer</Button>
+              <Button onClick={day.retry}>{messages.common.retry}</Button>
             </div>
           </div>
         )}
       </main>
       <IconButton
-        aria-label="Nouvel événement"
+        aria-label={t.newEvent}
         className={styles.addButton}
         onClick={() => setDialog({ type: 'create' })}
       >
@@ -110,8 +114,8 @@ function Day({ date, mutationError, onMutationError }: DayProps) {
 
       {dialog?.type === 'create' && (
         <EventFormDialog
-          title="Nouvel événement"
-          submitLabel="Ajouter"
+          title={t.newEvent}
+          submitLabel={t.add}
           initialValues={{ title: '', date, start: '', duration: 30, isPublic: false }}
           onSubmit={create}
           onClose={closeDialog}
@@ -128,8 +132,8 @@ function Day({ date, mutationError, onMutationError }: DayProps) {
       )}
       {dialog?.type === 'edit' && (
         <EventFormDialog
-          title="Modifier l'événement"
-          submitLabel="Enregistrer"
+          title={t.editEvent}
+          submitLabel={t.save}
           initialValues={dialog.event}
           onSubmit={(payload) => update(dialog.event, payload)}
           onClose={closeDialog}

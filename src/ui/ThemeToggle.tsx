@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMessages } from '../i18n/useLocale';
 import { IconButton } from './IconButton';
 import { DarkModeIcon, LightModeIcon } from './icons';
 
@@ -11,6 +12,7 @@ function isDarkApplied() {
 
 /** Light / dark switch. The <html data-theme> attribute is the source of truth. */
 export function ThemeToggle() {
+  const t = useMessages();
   const [isDark, setIsDark] = useState(isDarkApplied);
 
   function toggle() {
@@ -26,7 +28,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <IconButton aria-label="Thème sombre" aria-pressed={isDark} onClick={toggle}>
+    <IconButton aria-label={t.common.darkTheme} aria-pressed={isDark} onClick={toggle}>
       {isDark ? <LightModeIcon /> : <DarkModeIcon />}
     </IconButton>
   );

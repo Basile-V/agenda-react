@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
+import { useMessages } from '../../i18n/useLocale';
 import { Button } from '../../ui/Button';
 import { Spinner } from '../../ui/Spinner';
 import styles from './RequireAuth.module.scss';
@@ -8,13 +9,14 @@ import { useAuth } from './useAuth';
 export function RequireAuth() {
   const { session, retry } = useAuth();
   const location = useLocation();
+  const t = useMessages();
 
   if (session.status === 'unavailable') {
     return (
       <main className={styles.restoring}>
         <div role="alert" className={styles.error}>
-          <p>Le serveur ne répond pas pour le moment. Votre session n'est pas perdue.</p>
-          <Button onClick={retry}>Réessayer</Button>
+          <p>{t.auth.serverUnavailable}</p>
+          <Button onClick={retry}>{t.common.retry}</Button>
         </div>
       </main>
     );
@@ -23,7 +25,7 @@ export function RequireAuth() {
   if (session.status === 'restoring') {
     return (
       <main className={styles.restoring}>
-        <Spinner label="Chargement de la session…" />
+        <Spinner label={t.auth.restoringSession} />
       </main>
     );
   }

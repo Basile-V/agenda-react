@@ -1,3 +1,5 @@
+import type { Locale } from '../../i18n/locale';
+
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const DATE_KEY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
@@ -41,16 +43,22 @@ export function addDays(key: string, days: number): string {
   return toDateKey(date);
 }
 
-const dayTitleFormat = new Intl.DateTimeFormat('fr-FR', {
+const DAY_TITLE_OPTIONS = {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
   year: 'numeric',
-});
+} as const;
 
-/** '2026-09-29' → 'mardi 29 septembre 2026' */
-export function formatDayTitle(key: string): string {
-  return dayTitleFormat.format(fromDateKey(key));
+// British English: day before month and a 24-hour clock, like the rest of the interface.
+const dayTitleFormats: Record<Locale, Intl.DateTimeFormat> = {
+  fr: new Intl.DateTimeFormat('fr-FR', DAY_TITLE_OPTIONS),
+  en: new Intl.DateTimeFormat('en-GB', DAY_TITLE_OPTIONS),
+};
+
+/** '2026-09-29' → 'mardi 29 septembre 2026' or 'Tuesday 29 September 2026' */
+export function formatDayTitle(key: string, locale: Locale): string {
+  return dayTitleFormats[locale].format(fromDateKey(key));
 }
 
 /** Minutes since midnight → 'HH:MM', wrapping past midnight. */

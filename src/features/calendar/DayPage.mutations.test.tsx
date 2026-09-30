@@ -21,7 +21,7 @@ function eventBlock(id: number) {
 
 async function renderDay() {
   const result = renderWithRouter(`/${DAY}`);
-  await screen.findByRole('heading', { level: 1, name: formatDayTitle(DAY) });
+  await screen.findByRole('heading', { level: 1, name: formatDayTitle(DAY, 'fr') });
   await waitFor(() => expect(screen.queryByText('Chargement des événements…')).toBeNull());
   return result;
 }
@@ -373,7 +373,7 @@ test('a pending mutation does not hold back the navigation to another day', asyn
   await user.click(screen.getByRole('link', { name: 'Jour suivant' }));
   expect(router.state.location.pathname).toBe('/2026-09-30');
   expect(
-    await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30') }),
+    await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30', 'fr') }),
   ).toBeInTheDocument();
 
   // Let the deletion finish here: left pending, it would land on the next test's data.
@@ -390,7 +390,7 @@ test('a mutation refused after leaving its day is still reported', async () => {
   await user.click(screen.getByRole('button', { name: 'Supprimer' }));
 
   await user.click(screen.getByRole('link', { name: 'Jour suivant' }));
-  await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30') });
+  await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30', 'fr') });
   release();
 
   expect(await screen.findByRole('alert')).toHaveTextContent(

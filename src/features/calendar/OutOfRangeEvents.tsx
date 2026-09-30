@@ -1,3 +1,4 @@
+import { useMessages } from '../../i18n/useLocale';
 import { Button } from '../../ui/Button';
 import { DAY_END_HOUR, DAY_START_HOUR, isInDisplayedRange } from './layout';
 import styles from './OutOfRangeEvents.module.scss';
@@ -16,14 +17,15 @@ type OutOfRangeEventsProps = {
  * there: listed here, they stay visible and can still be opened, edited and deleted.
  */
 export function OutOfRangeEvents({ events, onSelect }: OutOfRangeEventsProps) {
+  const t = useMessages().calendar;
   const outside = events
     .filter((event) => !isInDisplayedRange(event))
     .toSorted((a, b) => a.start.localeCompare(b.start) || a.id - b.id);
   if (outside.length === 0) return null;
 
   return (
-    <section aria-label="Événements hors de la plage affichée" className={styles.outside}>
-      <p>Hors de la plage {RANGE} :</p>
+    <section aria-label={t.outOfRangeLabel} className={styles.outside}>
+      <p>{t.outOfRange(RANGE)}</p>
       <ul className={styles.list}>
         {outside.map((event) => (
           <li key={event.id}>
@@ -34,7 +36,7 @@ export function OutOfRangeEvents({ events, onSelect }: OutOfRangeEventsProps) {
               aria-busy={event.pending}
               onClick={() => onSelect(event)}
             >
-              <time>{event.start}</time> {event.title ?? `Événement ${event.id}`}
+              <time>{event.start}</time> {event.title ?? t.untitledEvent(event.id)}
             </Button>
           </li>
         ))}

@@ -13,6 +13,17 @@
       } catch {
         // Storage unavailable (private mode, blocked cookies): keep the light theme.
       }
+      // Language: the one chosen earlier, else the browser's. <html lang> is what the app reads
+      // (src/i18n/locale.ts, same storage key).
+      var locale = null;
+      try {
+        locale = localStorage.getItem('locale');
+      } catch {
+        // Storage unavailable: follow the browser.
+      }
+      if (locale !== 'fr' && locale !== 'en')
+        locale = navigator.language.startsWith('fr') ? 'fr' : 'en';
+      document.documentElement.lang = locale;
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Agenda</title>
@@ -53,6 +64,10 @@
         max-width: 26rem;
         margin: 0;
       }
+      html[lang='fr'] .boot [lang='en'],
+      html[lang='en'] .boot [lang='fr'] {
+        display: none;
+      }
       [data-theme='dark'] body {
         background: #0f1115;
       }
@@ -84,11 +99,21 @@
       <div class="boot" role="status">
         <div>
           <div class="boot-spinner" aria-hidden="true"></div>
-          <p class="boot-title">Le serveur se réveille…</p>
-          <p class="boot-message">
-            Il est hébergé gratuitement et se met en veille quand personne ne l'utilise. Son réveil
-            peut prendre jusqu'à quelques minutes, merci de votre patience.
-          </p>
+          <!-- Both languages, as React has not started yet: CSS keeps the one of <html lang>. -->
+          <div lang="fr">
+            <p class="boot-title">Le serveur se réveille…</p>
+            <p class="boot-message">
+              Il est hébergé gratuitement et se met en veille quand personne ne l'utilise. Son
+              réveil peut prendre jusqu'à quelques minutes, merci de votre patience.
+            </p>
+          </div>
+          <div lang="en">
+            <p class="boot-title">The server is waking up…</p>
+            <p class="boot-message">
+              It is hosted on a free plan and goes to sleep when nobody uses it. Waking up can take
+              up to a few minutes, thank you for your patience.
+            </p>
+          </div>
         </div>
       </div>
     </div>

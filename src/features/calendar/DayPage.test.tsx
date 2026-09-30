@@ -24,7 +24,7 @@ function eventBlock(id: number) {
 
 async function renderDay(date = DAY) {
   const result = renderWithRouter(`/${date}`);
-  await screen.findByRole('heading', { level: 1, name: formatDayTitle(date) });
+  await screen.findByRole('heading', { level: 1, name: formatDayTitle(date, 'fr') });
   await waitForEvents();
   return result;
 }
@@ -88,13 +88,19 @@ describe('header', () => {
   test('"Aujourd\'hui" goes to today', async () => {
     const { user, router } = await renderDay();
     await user.click(screen.getByRole('link', { name: "Aujourd'hui" }));
-    await screen.findByRole('heading', { level: 1, name: formatDayTitle(toDateKey(new Date())) });
+    await screen.findByRole('heading', {
+      level: 1,
+      name: formatDayTitle(toDateKey(new Date()), 'fr'),
+    });
     expect(router.state.location.pathname).toBe(`/${toDateKey(new Date())}`);
   });
 
   test('an invalid date redirects to today', async () => {
     const { router } = renderWithRouter('/2026-02-30');
-    await screen.findByRole('heading', { level: 1, name: formatDayTitle(toDateKey(new Date())) });
+    await screen.findByRole('heading', {
+      level: 1,
+      name: formatDayTitle(toDateKey(new Date()), 'fr'),
+    });
     expect(router.state.location.pathname).toBe(`/${toDateKey(new Date())}`);
   });
 });
@@ -251,5 +257,47 @@ describe('events outside 09:00 → 21:00', () => {
   test('the list is absent when every event fits the grid', async () => {
     await renderDay();
     expect(screen.queryByRole('region', { name: OUTSIDE })).toBeNull();
+  });
+});
+
+describe('language', () => {
+  test('switching to English translates the whole page, dates included', async () => {
+    db.events.push({
+      id: 13,
+      date: DAY,
+      start: '07:00',
+      duration: 45,
+      ownerId: 2,
+      isPublic: false,
+    });
+    const { user } = await renderDay();
+
+    await user.click(screen.getByRole('button', { name: 'Switch to English' }));
+
+    // The comma after the weekday depends on the ICU version.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /^Tuesday,? 29 September 2026$/,
+    );
+    expect(document.title).toMatch(/^Tuesday,? 29 September 2026 · Agenda$/);
+    expect(screen.getByRole('navigation', { name: 'Change day' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Today' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Events outside the displayed range' }),
+    ).toHaveTextContent('Outside 09:00 – 21:00:');
+    expect(screen.getByRole('button', { name: '07:00 Event 13' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Point équipe, at 09:30, 30 minutes' }));
+    const details = screen.getByRole('dialog', { name: 'Point équipe' });
+    expect(details).toHaveTextContent(/Tuesday,? 29 September 2026/);
+    expect(details).toHaveTextContent('Visibility');
+    await user.click(within(details).getByRole('button', { name: 'Edit' }));
+
+    const form = screen.getByRole('dialog', { name: 'Edit event' });
+    await user.clear(within(form).getByLabelText('Title'));
+    await user.tab();
+    expect(
+      within(form).getByRole('textbox', { name: 'Title', description: 'Title is required' }),
+    ).toBeInvalid();
+    expect(within(form).getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 });

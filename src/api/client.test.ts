@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { describe, expect, test, vi } from 'vitest';
+import { setLocale } from '../i18n/locale';
 import { apiUrl, setXsrfCookie } from '../test/handlers';
 import { server } from '../test/server';
 import { ApiError, apiFetch, getXsrfToken, onSessionExpired } from './client';
@@ -250,6 +251,19 @@ describe('responses and errors', () => {
     const error = await apiFetch('/api/thing', { method: 'POST' }).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect(error).toMatchObject({ status: 400, message: "Nom d'utilisateur déjà utilisé" });
+  });
+
+  test('in English, the French server message gives way to ours', async () => {
+    setLocale('en');
+    spyOn('post', '/api/thing', () => status(400, { message: "Nom d'utilisateur déjà utilisé" }));
+    await expect(apiFetch('/api/thing', { method: 'POST' })).rejects.toMatchObject({
+      status: 400,
+      message: 'Something went wrong. Please try again.',
+    });
+    spyOn('get', '/api/other', () => status(404));
+    await expect(apiFetch('/api/other')).rejects.toMatchObject({
+      message: 'This item no longer exists.',
+    });
   });
 
   test('technical server messages are replaced by a readable one', async () => {

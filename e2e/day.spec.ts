@@ -125,3 +125,28 @@ test('creates an event, then deletes it', async ({ page }) => {
     .click();
   await expect(created).toHaveCount(0);
 });
+
+test('the language follows the browser, then the choice made, which survives a reload', async ({
+  page,
+}) => {
+  await login(page);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+
+  await page.getByRole('button', { name: 'Switch to English' }).click();
+  await expect(page.getByRole('link', { name: 'Today' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New event' })).toBeVisible();
+
+  // The mock backend forgets the session on reload; the language does not depend on it.
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('tab', { name: 'Log in' })).toBeVisible();
+});
+
+test.describe('in a browser that is not French', () => {
+  test.use({ locale: 'de-DE' });
+
+  test('the app starts in English', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('tab', { name: 'Log in' })).toBeVisible();
+  });
+});

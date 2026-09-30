@@ -1,5 +1,6 @@
 import { useActionState } from 'react';
 import { ApiError } from '../../api/client';
+import { useMessages } from '../../i18n/useLocale';
 import { getText } from '../../ui/formData';
 import { SubmitButton } from '../../ui/SubmitButton';
 import { TextField } from '../../ui/TextField';
@@ -15,20 +16,23 @@ const initialState: LoginState = { username: '', errors: {} };
 
 export function LoginForm() {
   const { login } = useAuth();
+  const t = useMessages().auth;
 
   async function loginAction(_: LoginState, formData: FormData): Promise<LoginState> {
     const username = getText(formData, 'username').trim();
     const password = getText(formData, 'password');
     const errors: LoginState['errors'] = {};
-    if (!username) errors.username = "Le nom d'utilisateur est requis";
-    if (!password) errors.password = 'Le mot de passe est requis';
+    if (!username) errors.username = t.usernameRequired;
+    if (!password) errors.password = t.passwordRequired;
     if (Object.keys(errors).length > 0) return { username, errors };
 
     try {
       await login({ username, password });
       return initialState;
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Connexion impossible.';
+      if (!(error instanceof ApiError)) return { username, errors: { form: t.loginFailed } };
+      // On this request, a 401 is the answer itself: wrong credentials, not an expired session.
+      const message = error.status === 401 ? t.invalidCredentials : error.message;
       return { username, errors: { form: message } };
     }
   }
@@ -39,7 +43,7 @@ export function LoginForm() {
     // noValidate: our own messages, linked to the fields, instead of the browser bubbles.
     <form action={formAction} noValidate className={styles.form}>
       <TextField
-        label="Nom d'utilisateur"
+        label={t.username}
         name="username"
         autoComplete="username"
         required
@@ -48,7 +52,7 @@ export function LoginForm() {
         error={state.errors.username}
       />
       <TextField
-        label="Mot de passe"
+        label={t.password}
         name="password"
         type="password"
         autoComplete="current-password"
@@ -60,7 +64,7 @@ export function LoginForm() {
           {state.errors.form}
         </p>
       )}
-      <SubmitButton>Se connecter</SubmitButton>
+      <SubmitButton>{t.submitLogin}</SubmitButton>
     </form>
   );
 }

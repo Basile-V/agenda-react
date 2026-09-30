@@ -2,6 +2,7 @@ import { startTransition, useEffect, useOptimistic, useReducer } from 'react';
 import { ApiError } from '../../api/client';
 import { createEvent, deleteEvent, getEvents, updateEvent } from '../../api/events';
 import type { CalendarEvent, EventPayload } from '../../api/types';
+import { getMessages } from '../../i18n/messages';
 import { applyEventChange, type EventChange } from './eventChanges';
 
 /** An event as displayed: `pending` while its change awaits the server's confirmation. */
@@ -58,7 +59,7 @@ export function useDayEvents(date: string) {
         dispatch({ type: 'settled', result: { date, attempt, status: 'success', events } }),
       (error: unknown) => {
         if (controller.signal.aborted) return;
-        const message = toMessage(error, 'Impossible de charger les événements.');
+        const message = toMessage(error, getMessages().calendar.loadFailed);
         dispatch({ type: 'settled', result: { date, attempt, status: 'error', message } });
       },
     );
@@ -84,7 +85,7 @@ export function useDayEvents(date: string) {
           startTransition(() => dispatch({ type: 'changed', change: confirmed }));
           resolve();
         } catch (error) {
-          reject(new Error(toMessage(error, 'Une erreur est survenue. Réessayez.')));
+          reject(new Error(toMessage(error, getMessages().common.genericError)));
         }
       });
     });

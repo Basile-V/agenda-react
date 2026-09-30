@@ -1,13 +1,22 @@
+import { getLocale } from '../i18n/locale';
+import { getMessages } from '../i18n/messages';
+
 const XSRF_COOKIE = 'XSRF-TOKEN';
 const XSRF_HEADER = 'X-XSRF-TOKEN';
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-const DEFAULT_MESSAGES: Record<number, string> = {
-  0: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
-  401: 'Votre session a expiré. Reconnectez-vous.',
-  403: "Vous n'avez pas le droit d'effectuer cette action.",
-  404: "Cet élément n'existe plus.",
-};
+// ponytail: the message is written in the language current when the error is created, and a
+// displayed error keeps it if the user switches. Carry a message key instead if that matters.
+function defaultMessage(status: number): string {
+  const { api, common } = getMessages();
+  const byStatus: Record<number, string> = {
+    0: api.unreachable,
+    401: api.sessionExpired,
+    403: api.forbidden,
+    404: api.notFound,
+  };
+  return byStatus[status] ?? common.genericError;
+}
 
 export class ApiError extends Error {
   override name = 'ApiError';
@@ -15,7 +24,7 @@ export class ApiError extends Error {
 
   /** `status` is 0 when the server could not be reached. */
   constructor(status: number, message?: string) {
-    super(message ?? DEFAULT_MESSAGES[status] ?? 'Une erreur est survenue. Réessayez.');
+    super(message ?? defaultMessage(status));
     this.status = status;
   }
 }
@@ -98,6 +107,8 @@ function refreshSession(): Promise<void> {
 async function toApiError(response: Response): Promise<ApiError> {
   // Other statuses carry technical server messages (ids, class names): show ours instead.
   if (response.status !== 400 && response.status !== 401) return new ApiError(response.status);
+  // The backend only speaks French: in another language, ours is the only readable message.
+  if (getLocale() !== 'fr') return new ApiError(response.status);
   const body: unknown = await response.json().catch(() => null);
   const message = isRecord(body) && typeof body.message === 'string' ? body.message : undefined;
   return new ApiError(response.status, message);
@@ -173,5 +184,5 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
 
 /** For API modules: the server answered, but not with the expected shape. */
 export function unexpectedResponse(): ApiError {
-  return new ApiError(502, 'Réponse inattendue du serveur.');
+  return new ApiError(502, getMessages().api.unexpectedResponse);
 }

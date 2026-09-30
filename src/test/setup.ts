@@ -24,6 +24,8 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 beforeEach(() => resetDb());
 afterEach(() => {
   cleanup();
+  // Back to the default language (French).
+  document.documentElement.removeAttribute('lang');
   server.resetHandlers();
   clearXsrfCookie();
   resetResizeObserver();

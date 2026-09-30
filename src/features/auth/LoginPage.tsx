@@ -1,4 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
+import { useMessages } from '../../i18n/useLocale';
+import { LanguageToggle } from '../../ui/LanguageToggle';
 import { Tabs } from '../../ui/Tabs';
 import { ThemeToggle } from '../../ui/ThemeToggle';
 import styles from './LoginPage.module.scss';
@@ -16,6 +18,7 @@ function redirectTarget(state: unknown): string {
 export function LoginPage() {
   const { session } = useAuth();
   const location = useLocation();
+  const t = useMessages().auth;
 
   // Logged in (just now, or already): go where the user was heading, today by default.
   if (session.status === 'authenticated') {
@@ -24,17 +27,18 @@ export function LoginPage() {
 
   return (
     <main className={styles.page}>
-      <title>Connexion · Agenda</title>
+      <title>{`${t.login} · Agenda`}</title>
       <div className={styles.theme}>
+        <LanguageToggle />
         <ThemeToggle />
       </div>
       <div className={styles.card}>
         <h1 className={styles.title}>Agenda</h1>
         <Tabs
-          label="Accès au compte"
+          label={t.tabsLabel}
           tabs={[
-            { id: 'login', label: 'Connexion', panel: <LoginForm /> },
-            { id: 'register', label: 'Inscription', panel: <RegisterForm /> },
+            { id: 'login', label: t.login, panel: <LoginForm /> },
+            { id: 'register', label: t.register, panel: <RegisterForm /> },
           ]}
         />
       </div>

@@ -1,5 +1,7 @@
 import { useCallback, useState, type FocusEvent, type FormEvent } from 'react';
 import type { EventPayload } from '../../api/types';
+import type { Messages } from '../../i18n/messages';
+import { useMessages } from '../../i18n/useLocale';
 import { Button } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
 import { getText } from '../../ui/formData';
@@ -18,25 +20,27 @@ type FieldName = 'title' | 'date' | 'start' | 'duration';
 
 type Constraint = keyof Omit<ValidityState, 'valid' | 'customError'>;
 
+type ErrorMessages = Messages['eventForm']['errors'];
+
 /** Per field, the message of each native constraint it can fail, in priority order. */
-const MESSAGES: Record<FieldName, [Constraint, string][]> = {
+const MESSAGES: Record<FieldName, [Constraint, keyof ErrorMessages][]> = {
   title: [
-    ['valueMissing', 'Le titre est requis'],
-    ['patternMismatch', 'Le titre est requis'],
+    ['valueMissing', 'titleRequired'],
+    ['patternMismatch', 'titleRequired'],
   ],
   date: [
-    ['valueMissing', 'La date est requise'],
-    ['badInput', 'Date invalide'],
+    ['valueMissing', 'dateRequired'],
+    ['badInput', 'dateInvalid'],
   ],
   start: [
-    ['valueMissing', "L'heure de début est requise"],
-    ['badInput', 'Format attendu HH:MM'],
+    ['valueMissing', 'startRequired'],
+    ['badInput', 'startFormat'],
   ],
   duration: [
-    ['valueMissing', 'La durée est requise'],
-    ['badInput', 'La durée doit être un nombre'],
-    ['rangeUnderflow', "La durée doit être d'au moins 1 minute"],
-    ['stepMismatch', 'La durée doit être un nombre entier de minutes'],
+    ['valueMissing', 'durationRequired'],
+    ['badInput', 'durationNotANumber'],
+    ['rangeUnderflow', 'durationTooShort'],
+    ['stepMismatch', 'durationNotAnInteger'],
   ],
 };
 
@@ -44,11 +48,11 @@ function isFieldName(name: string): name is FieldName {
   return name in MESSAGES;
 }
 
-/** French message for the first failing native constraint of a field. */
-function errorFor(input: HTMLInputElement): string | undefined {
+/** Our message for the first failing native constraint of a field. */
+function errorFor(input: HTMLInputElement, messages: ErrorMessages): string | undefined {
   if (input.validity.valid || !isFieldName(input.name)) return undefined;
   const failing = MESSAGES[input.name].find(([constraint]) => input.validity[constraint]);
-  return failing?.[1] ?? input.validationMessage;
+  return failing ? messages[failing[1]] : input.validationMessage;
 }
 
 /**
@@ -63,6 +67,7 @@ export function EventFormDialog({
   onSubmit,
   onClose,
 }: EventFormDialogProps) {
+  const t = useMessages().eventForm;
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [isValid, setIsValid] = useState(false);
 
@@ -73,7 +78,7 @@ export function EventFormDialog({
   function showError(input: HTMLInputElement) {
     if (!isFieldName(input.name)) return;
     const name = input.name;
-    setErrors((previous) => ({ ...previous, [name]: errorFor(input) }));
+    setErrors((previous) => ({ ...previous, [name]: errorFor(input, t.errors) }));
   }
 
   function handleBlur(event: FocusEvent<HTMLFormElement>) {
@@ -118,18 +123,18 @@ export function EventFormDialog({
         onInput={handleInput}
       >
         <TextField
-          label="Titre"
+          label={t.title}
           name="title"
           required
           pattern=".*\S.*"
           // The backend's column: beyond it, the server fails with a generic error.
           maxLength={255}
-          placeholder="Ex. : Réunion d'équipe"
+          placeholder={t.titlePlaceholder}
           defaultValue={initialValues.title ?? ''}
           error={errors.title}
         />
         <TextField
-          label="Date"
+          label={t.date}
           name="date"
           type="date"
           required
@@ -138,7 +143,7 @@ export function EventFormDialog({
         />
         <div className={styles.row}>
           <TextField
-            label="Heure de début"
+            label={t.start}
             name="start"
             type="time"
             required
@@ -146,7 +151,7 @@ export function EventFormDialog({
             error={errors.start}
           />
           <TextField
-            label="Durée (minutes)"
+            label={t.duration}
             name="duration"
             type="number"
             inputMode="numeric"
@@ -159,11 +164,11 @@ export function EventFormDialog({
         </div>
         <label className={styles.checkbox}>
           <input type="checkbox" name="isPublic" defaultChecked={initialValues.isPublic} />
-          Événement public (visible par tous les utilisateurs)
+          {t.isPublic}
         </label>
         <div className={styles.actions}>
           <Button variant="ghost" onClick={onClose}>
-            Annuler
+            {t.cancel}
           </Button>
           <Button type="submit" disabled={!isValid}>
             {submitLabel}

@@ -1,4 +1,6 @@
 import type { CSSProperties, KeyboardEvent } from 'react';
+import type { Messages } from '../../i18n/messages';
+import { useMessages } from '../../i18n/useLocale';
 import styles from './EventBlock.module.scss';
 import type { DisplayedEvent } from './useDayEvents';
 
@@ -10,13 +12,17 @@ type EventBlockProps = {
   onSelect: (event: DisplayedEvent) => void;
 };
 
-function accessibleLabel({ id, title, start, duration, isPublic }: DisplayedEvent) {
-  const parts = [title ?? `Événement ${id}`, `à ${start}`, `${duration} minutes`];
-  if (isPublic) parts.push('public');
+function accessibleLabel(
+  { id, title, start, duration, isPublic }: DisplayedEvent,
+  t: Messages['calendar'],
+) {
+  const parts = [title ?? t.untitledEvent(id), t.atTime(start), t.minutes(duration)];
+  if (isPublic) parts.push(t.publicLabel);
   return parts.join(', ');
 }
 
 export function EventBlock({ event, position, isOwn, onSelect }: EventBlockProps) {
+  const t = useMessages().calendar;
   const style: CSSProperties = {
     top: position.top,
     height: position.height,
@@ -41,7 +47,7 @@ export function EventBlock({ event, position, isOwn, onSelect }: EventBlockProps
     : {
         role: 'button',
         tabIndex: 0,
-        'aria-label': accessibleLabel(event),
+        'aria-label': accessibleLabel(event, t),
         onClick: () => onSelect(event),
         onKeyDown: handleKeyDown,
       };
@@ -60,7 +66,7 @@ export function EventBlock({ event, position, isOwn, onSelect }: EventBlockProps
       <p className={styles.meta}>
         <time>{event.start}</time> · {event.duration} min
       </p>
-      {event.isPublic && <span className={styles.badge}>Public</span>}
+      {event.isPublic && <span className={styles.badge}>{t.public}</span>}
     </div>
   );
 }

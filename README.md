@@ -31,7 +31,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 257 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 6 tests
+- **Testé** : 266 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 8 tests
   Playwright qui mesurent les règles du kata dans un vrai navigateur. Tout tourne en CI.
   TypeScript `strict`, ESLint avec règles typées.
 
@@ -59,6 +59,8 @@ Le front Angular a servi de référence fonctionnelle, pas de modèle d'architec
 - **Réveil du serveur** : message statique dans `index.html` avant le démarrage de React, puis
   une modale d'attente pour toute requête qui dépasse 2 s (jamais pour une réponse rapide).
 - **Thème clair ou sombre** au choix, mémorisé, appliqué avant le premier affichage.
+- **Français ou anglais** : la langue du navigateur au premier passage, puis celle qu'on choisit,
+  mémorisée. Textes, messages d'erreur et dates suivent, sans recharger la page.
 - **Mobile** : la mise en page s'adapte aux petits écrans.
 
 ## Choix techniques
@@ -72,11 +74,12 @@ la plateforme :
 |---|---|
 | Modales, focus piégé, Échap, fond inerte | `<dialog>` + `showModal()` |
 | Sélection de date et d'heure | `<input type="date">`, `<input type="time">` |
-| Validation des formulaires | Contraintes natives (`required`, `min`, `pattern`) + `checkValidity()`, messages en français |
+| Validation des formulaires | Contraintes natives (`required`, `min`, `pattern`) + `checkValidity()`, nos messages, traduits |
 | Formatage des dates | `Intl.DateTimeFormat` |
 | Requêtes HTTP | `fetch` + `AbortController` |
 | Mesure de la grille | `ResizeObserver` |
 | Thème | Variables CSS redéfinies sous `[data-theme='dark']` |
+| Traductions | Deux dictionnaires TypeScript : une clé oubliée en anglais ne compile pas |
 
 ### React 19
 
@@ -86,7 +89,9 @@ la plateforme :
 - **`useActionState` + `<form action>` + `useFormStatus`** pour la connexion et l'inscription :
   erreurs par champ et état d'envoi sans `useState` à la main.
 - **`useSyncExternalStore`** pour le compteur de requêtes lentes : il vit dans le client HTTP,
-  hors de React, et un hook d'une ligne le lit. Aucun provider.
+  hors de React, et un hook d'une ligne le lit. Aucun provider. Même principe pour la langue :
+  `<html lang>` fait foi (posé avant le premier affichage, comme le thème), le client HTTP la lit
+  sans dépendre de React, et changer de langue ne re-rend que les composants qui ont du texte.
 - **`use(AuthContext)`**, `<AuthContext value>`, **`ref` en prop** (pas de `forwardRef`),
   **callbacks `ref` avec nettoyage** (ouverture des modales, `ResizeObserver`), **`<title>`**
   rendu dans les pages.
@@ -186,7 +191,9 @@ src/
                 EventDetailsDialog, OutOfRangeEvents, useDayEvents, layout.ts, time.ts,
                 eventChanges.ts
     loading/    useIsWaitingForServer, ServerWakeOverlay
-  ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, ThemeToggle, icons
+  i18n/         langue courante (locale.ts), dictionnaires fr / en (messages.ts), useMessages
+  ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, ThemeToggle,
+                LanguageToggle, icons
   styles/       variables CSS, reset
   test/         faux backend MSW, helpers de rendu, ResizeObserver de test
 worker/         proxy Cloudflare : /backend/* relayé vers le backend (même origine)
