@@ -16,7 +16,7 @@ export function ServerWakeOverlay() {
       <Spinner />
       <p className={styles.message}>
         Il est hébergé gratuitement et se met en veille quand personne ne l'utilise. Son réveil peut
-        prendre jusqu'à une minute, merci de votre patience.
+        prendre jusqu'à quelques minutes, merci de votre patience.
       </p>
     </Dialog>
   );

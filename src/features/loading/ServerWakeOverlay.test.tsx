@@ -32,7 +32,7 @@ test('shows while a request is slow, then goes away', async () => {
 
   await act(() => vi.advanceTimersByTimeAsync(1));
   const dialog = screen.getByRole('dialog', { name: 'Le serveur se réveille…' });
-  expect(dialog).toHaveTextContent("jusqu'à une minute");
+  expect(dialog).toHaveTextContent("jusqu'à quelques minutes");
 
   // A blocking wait: Escape does not dismiss it.
   fireEvent(dialog, new Event('cancel', { cancelable: true }));
