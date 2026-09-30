@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { BASILE, db, resetDb } from '../../test/db';
@@ -92,6 +92,36 @@ describe('create', () => {
       "La durée doit être d'au moins 1 minute",
     );
     expect(submit).toBeDisabled();
+  });
+
+  test('a field left without moving to another one still gets its message', async () => {
+    const { user } = await renderDay();
+    await user.click(screen.getByRole('button', { name: 'Nouvel événement' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nouvel événement' });
+
+    // A tap on an empty part of the dialog: the focus goes nowhere.
+    await user.click(within(dialog).getByRole('heading', { name: 'Nouvel événement' }));
+    expect(within(dialog).getByLabelText('Titre')).toHaveAccessibleDescription(
+      'Le titre est requis',
+    );
+  });
+
+  test('switching to another window does not flag the field being filled', async () => {
+    const { user } = await renderDay();
+    await user.click(screen.getByRole('button', { name: 'Nouvel événement' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nouvel événement' });
+    const title = within(dialog).getByLabelText('Titre');
+
+    // No user-event equivalent: the window loses the focus, the field remains the active element.
+    fireEvent.focusOut(title);
+    expect(title).toHaveFocus();
+    expect(title).not.toHaveAccessibleDescription();
+  });
+
+  test('the title cannot exceed what the server stores', async () => {
+    const { user } = await renderDay();
+    await user.click(screen.getByRole('button', { name: 'Nouvel événement' }));
+    expect(screen.getByLabelText('Titre')).toHaveAttribute('maxlength', '255');
   });
 
   test('a blank title is not a title', async () => {

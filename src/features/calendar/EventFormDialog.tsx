@@ -77,10 +77,8 @@ export function EventFormDialog({
   }
 
   function handleBlur(event: FocusEvent<HTMLFormElement>) {
-    // Only when moving on to another part of the form: leaving the dialog (closing it)
-    // is no reason to flag a field.
-    if (!(event.target instanceof HTMLInputElement)) return;
-    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+    // Still the active element: the window lost the focus (another tab), the field was not left.
+    if (event.target instanceof HTMLInputElement && event.target !== document.activeElement) {
       showError(event.target);
     }
   }
@@ -124,6 +122,8 @@ export function EventFormDialog({
           name="title"
           required
           pattern=".*\S.*"
+          // The backend's column: beyond it, the server fails with a generic error.
+          maxLength={255}
           placeholder="Ex. : Réunion d'équipe"
           defaultValue={initialValues.title ?? ''}
           error={errors.title}
