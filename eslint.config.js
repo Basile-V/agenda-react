@@ -7,7 +7,15 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist', 'public/mockServiceWorker.js', 'graphify-out', '.wrangler']),
+  globalIgnores([
+    'dist',
+    'public/mockServiceWorker.js',
+    'graphify-out',
+    '.wrangler',
+    'coverage',
+    'playwright-report',
+    'test-results',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

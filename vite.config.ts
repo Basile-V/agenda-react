@@ -14,6 +14,21 @@ export default defineConfig({
     },
   ],
   test: {
+    // e2e/ belongs to Playwright.
+    include: ['{src,worker}/**/*.test.{ts,tsx}'],
+    coverage: {
+      include: ['src/**', 'worker/**'],
+      // Bootstrap and test tooling: exercised by the e2e tests, not by these ones.
+      exclude: ['src/main.tsx', 'src/App.tsx', 'src/test/**', '**/*.d.ts'],
+      thresholds: {
+        statements: 95,
+        branches: 88,
+        functions: 97,
+        lines: 97,
+        // The pure domain logic, written test first, stays fully covered.
+        'src/features/calendar/{layout,time,eventChanges}.ts': { 100: true },
+      },
+    },
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     restoreMocks: true,
