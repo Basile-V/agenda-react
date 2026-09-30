@@ -15,6 +15,11 @@
 .title {
   font-size: clamp(1.0625rem, 4vw, 1.25rem);
 
+  @media (width < 30rem) {
+    order: 1;
+    flex-basis: 100%;
+  }
+
   &::first-letter {
     text-transform: uppercase;
   }

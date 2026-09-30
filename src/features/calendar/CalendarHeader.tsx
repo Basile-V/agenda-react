@@ -13,9 +13,6 @@ export function CalendarHeader({ date }: { date: string }) {
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>
-        <time dateTime={date}>{formatDayTitle(date)}</time>
-      </h1>
       <nav aria-label="Changer de jour" className={styles.nav}>
         <Link to={`/${addDays(date, -1)}`} className={styles.iconLink} aria-label="Jour précédent">
           <ChevronLeftIcon />
@@ -31,6 +28,9 @@ export function CalendarHeader({ date }: { date: string }) {
           <ChevronRightIcon />
         </Link>
       </nav>
+      <h1 className={styles.title}>
+        <time dateTime={date}>{formatDayTitle(date)}</time>
+      </h1>
       <div className={styles.user}>
         <ThemeToggle />
         <span>{user.displayName}</span>
