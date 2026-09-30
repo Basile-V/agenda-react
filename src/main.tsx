@@ -10,7 +10,8 @@ async function enableMocking() {
   const { setupWorker } = await import('msw/browser');
   const { handlers } = await import('./test/handlers');
   const { resetDb } = await import('./test/db');
-  // ponytail: mock session is lost on reload, persist it in sessionStorage if demos need it
+  // Known limit: the mock backend lives in memory, so a reload logs out and restores the seed
+  // data. Persist it in sessionStorage if demos need it.
   resetDb();
   await setupWorker(...handlers).start({ onUnhandledRequest: 'bypass' });
 }

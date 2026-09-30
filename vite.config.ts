@@ -1,8 +1,18 @@
 import react from '@vitejs/plugin-react';
+import { rm } from 'node:fs/promises';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      // MSW's service worker has to sit in public/ for `npm run dev:mock`, and Vite copies
+      // public/ into every build: keep it out of the ones that do not mock the API.
+      name: 'drop-msw-worker',
+      apply: (_, { command, mode }) => command === 'build' && mode !== 'mock',
+      closeBundle: () => rm('dist/mockServiceWorker.js', { force: true }),
+    },
+  ],
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
