@@ -31,7 +31,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 251 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 5 tests
+- **Testé** : 257 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 6 tests
   Playwright qui mesurent les règles du kata dans un vrai navigateur. Tout tourne en CI.
   TypeScript `strict`, ESLint avec règles typées.
 
@@ -46,7 +46,8 @@ Le front Angular a servi de référence fonctionnelle, pas de modèle d'architec
 - **Vue jour** sur `/:date` (`YYYY-MM-DD`) : jour précédent, suivant, aujourd'hui. La date vit
   uniquement dans l'URL, et chaque jour a donc un lien partageable.
 - **Grille 09:00 → 21:00** : position et hauteur proportionnelles à l'heure et à la durée,
-  recalculées quand la grille change de taille (`ResizeObserver`).
+  recalculées quand la grille change de taille (`ResizeObserver`). Un événement trop court pour
+  afficher son texte garde sa hauteur proportionnelle et s'agrandit au survol ou au focus.
 - **Chevauchements** répartis selon les règles du kata (voir [plus bas](#algorithme-de-chevauchement)).
 - **Événements hors plage** : ceux qui tombent entièrement avant 09:00 ou après 21:00 sont listés
   au-dessus de la grille, et s'ouvrent comme les autres, au lieu de disparaître.

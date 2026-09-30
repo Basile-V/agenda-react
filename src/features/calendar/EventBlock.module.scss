@@ -19,6 +19,14 @@
     &:hover {
       box-shadow: var(--shadow-md);
     }
+
+    /* Kata: the height is the duration, so a very short event cannot show its text. Pointed at
+       or focused, it grows to its content, above its neighbours; the layout is left alone. */
+    &:hover,
+    &:focus-visible {
+      z-index: 1;
+      min-height: fit-content;
+    }
   }
 }
 

@@ -80,6 +80,30 @@ test('an event sits at its time, with a height proportional to its duration', as
   expect(Math.abs(lunch.height - hour)).toBeLessThan(2);
 });
 
+test('a very short event keeps its proportional height, and shows its content when hovered', async ({
+  page,
+}) => {
+  await login(page);
+  await page.getByRole('button', { name: 'Nouvel événement' }).click();
+  const form = page.getByRole('dialog', { name: 'Nouvel événement' });
+  await form.getByLabel('Titre').fill('Appel');
+  await form.getByLabel('Heure de début').fill('16:00');
+  await form.getByLabel('Durée (minutes)').fill('5');
+  await form.getByRole('button', { name: 'Ajouter' }).click();
+
+  const short = page.locator('#event-6');
+  await expect(short).toContainText('#6 Appel');
+  const area = await box(short.locator('..'));
+  const fiveMinutes = (area.height / 12 / 60) * 5;
+  expect(Math.abs((await box(short)).height - fiveMinutes)).toBeLessThan(2);
+
+  // Too small for its text: pointed at, it grows just enough to be read.
+  await short.hover();
+  const title = await box(short.getByText('Appel'));
+  const grown = await box(short);
+  expect(grown.y + grown.height).toBeGreaterThanOrEqual(title.y + title.height);
+});
+
 test('creates an event, then deletes it', async ({ page }) => {
   await login(page);
 
