@@ -18,10 +18,20 @@ import { useDayEvents } from './useDayEvents';
 
 export function DayPage() {
   const { date = '' } = useParams();
+  // Above the key: a mutation refused after the user moved to another day is still reported.
+  const [mutationError, setMutationError] = useState<string | null>(null);
   if (!isValidDateKey(date)) return <TodayRedirect />;
-  // Keyed by date: nothing of a day's page state (open dialog, error) leaks into the next one.
-  return <Day key={date} date={date} />;
+  // Keyed by date: nothing else of a day's page state (open dialog) leaks into the next one.
+  return (
+    <Day key={date} date={date} mutationError={mutationError} onMutationError={setMutationError} />
+  );
 }
+
+type DayProps = {
+  date: string;
+  mutationError: string | null;
+  onMutationError: (message: string | null) => void;
+};
 
 type OpenDialog =
   | { type: 'create' }
@@ -29,11 +39,10 @@ type OpenDialog =
   | { type: 'edit'; event: CalendarEvent }
   | null;
 
-function Day({ date }: { date: string }) {
+function Day({ date, mutationError, onMutationError }: DayProps) {
   const user = useCurrentUser();
   const day = useDayEvents(date);
   const [dialog, setDialog] = useState<OpenDialog>(null);
-  const [mutationError, setMutationError] = useState<string | null>(null);
   const closeDialog = () => setDialog(null);
   const showDetails = (event: CalendarEvent) => setDialog({ type: 'details', event });
   const events = day.status === 'success' ? day.events : [];
@@ -41,9 +50,9 @@ function Day({ date }: { date: string }) {
   // Optimistic: the dialog closes at once and the grid shows the change right away. If the
   // server refuses it, the change rolls back by itself and we explain why.
   function run(mutation: Promise<void>, failure: string) {
-    setMutationError(null);
+    onMutationError(null);
     mutation.catch((error: unknown) => {
-      setMutationError(`${failure} ${error instanceof Error ? error.message : ''}`.trim());
+      onMutationError(`${failure} ${error instanceof Error ? error.message : ''}`.trim());
     });
   }
 
@@ -69,7 +78,7 @@ function Day({ date }: { date: string }) {
       {mutationError && (
         <div role="alert" className={styles.banner}>
           <p>{mutationError}</p>
-          <IconButton aria-label="Masquer le message" onClick={() => setMutationError(null)}>
+          <IconButton aria-label="Masquer le message" onClick={() => onMutationError(null)}>
             <CloseIcon />
           </IconButton>
         </div>

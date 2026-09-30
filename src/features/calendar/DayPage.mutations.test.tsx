@@ -335,7 +335,7 @@ describe('delete', () => {
 });
 
 test('a pending mutation does not hold back the navigation to another day', async () => {
-  holdNext('delete', '/api/events/:id');
+  const release = holdNext('delete', '/api/events/:id');
   const { user, router } = await renderDay();
   await user.click(eventBlock(1)!);
   await user.click(screen.getByRole('button', { name: 'Supprimer' }));
@@ -345,4 +345,25 @@ test('a pending mutation does not hold back the navigation to another day', asyn
   expect(
     await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30') }),
   ).toBeInTheDocument();
+
+  // Let the deletion finish here: left pending, it would land on the next test's data.
+  release();
+  await waitFor(() => expect(db.events.some((e) => e.id === 1)).toBe(false));
+});
+
+test('a mutation refused after leaving its day is still reported', async () => {
+  // Registered last, the held handler runs first, then falls through to the failing one.
+  failNext('delete', '/api/events/:id', 500);
+  const release = holdNext('delete', '/api/events/:id');
+  const { user } = await renderDay();
+  await user.click(eventBlock(1)!);
+  await user.click(screen.getByRole('button', { name: 'Supprimer' }));
+
+  await user.click(screen.getByRole('link', { name: 'Jour suivant' }));
+  await screen.findByRole('heading', { level: 1, name: formatDayTitle('2026-09-30') });
+  release();
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    "L'événement n'a pas pu être supprimé. Une erreur est survenue. Réessayez.",
+  );
 });
