@@ -31,7 +31,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 248 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 5 tests
+- **Testé** : 251 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 5 tests
   Playwright qui mesurent les règles du kata dans un vrai navigateur. Tout tourne en CI.
   TypeScript `strict`, ESLint avec règles typées.
 
@@ -41,7 +41,8 @@ Le front Angular a servi de référence fonctionnelle, pas de modèle d'architec
 ## Fonctionnalités
 
 - **Connexion et inscription** sur `/login` (deux onglets). Session par cookies httpOnly (JWT),
-  restaurée au chargement ; après connexion, retour à la page demandée.
+  restaurée au chargement ; après connexion, retour à la page demandée. Si le serveur ne répond
+  pas pendant la restauration, l'application propose de réessayer au lieu de déconnecter.
 - **Vue jour** sur `/:date` (`YYYY-MM-DD`) : jour précédent, suivant, aujourd'hui. La date vit
   uniquement dans l'URL, et chaque jour a donc un lien partageable.
 - **Grille 09:00 → 21:00** : position et hauteur proportionnelles à l'heure et à la durée,
@@ -51,7 +52,7 @@ Le front Angular a servi de référence fonctionnelle, pas de modèle d'architec
   au-dessus de la grille, et s'ouvrent comme les autres, au lieu de disparaître.
 - **Création, détails, modification, suppression** dans des modales `<dialog>`. Les
   changements s'affichent tout de suite et reviennent en arrière si le serveur les refuse, avec un
-  message qui explique pourquoi.
+  message qui explique pourquoi, même si on a changé de jour entre-temps.
 - **Événements publics et privés** : on voit les siens et les événements publics des autres,
   en lecture seule.
 - **Réveil du serveur** : message statique dans `index.html` avant le démarrage de React, puis

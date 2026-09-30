@@ -87,6 +87,21 @@ describe('route protection', () => {
     expect(calls).toBe(2);
   });
 
+  test.each([
+    ['answers with an error', () => new HttpResponse(null, { status: 502 })],
+    ['cannot be reached', () => HttpResponse.error()],
+  ])('a server that %s is not a logout: offers to retry', async (_, respond) => {
+    db.sessionUserId = BASILE.id;
+    server.use(http.get(apiUrl('/api/auth/me'), respond, { once: true }));
+    const { user, router } = renderWithRouter('/2026-09-29');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Le serveur ne répond pas');
+    expect(router.state.location.pathname).toBe('/2026-09-29');
+
+    await user.click(screen.getByRole('button', { name: 'Réessayer' }));
+    await findDayPage('2026-09-29');
+  });
+
   test('/login redirects to today when already logged in', async () => {
     db.sessionUserId = BASILE.id;
     renderWithRouter('/login');
