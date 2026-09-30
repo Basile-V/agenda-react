@@ -29,7 +29,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 235 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
+- **Testé** : 237 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
   des assertions dédiées. TypeScript `strict`, ESLint avec règles typées.
 
 C'est la réécriture en React d'un front Angular existant (même backend, mêmes fonctionnalités).
@@ -84,11 +84,11 @@ la plateforme :
   **callbacks `ref` avec nettoyage** (ouverture des modales, `ResizeObserver`), **`<title>`**
   rendu dans les pages.
 
-Deux pièges évités, testés et documentés dans [CLAUDE.md](CLAUDE.md) :
+Deux pièges évités, et testés :
 
 - **Transitions regroupées.** Tant qu'une action asynchrone est en cours, React regroupe toutes
   les transitions. Par défaut, React Router passe ses navigations en transition : une création
-  envoyée au serveur endormi aurait bloqué le changement de jour pendant une minute. Les
+  envoyée au serveur endormi aurait bloqué le changement de jour pendant plusieurs minutes. Les
   navigations restent donc immédiates (`useTransitions={false}`, nos routes n'ont pas de loader).
   Pour la même raison, le formulaire d'événement utilise `onSubmit` et non `<form action>`.
 - **Pas de flash de l'ancien jour.** `useDayEvents` ne remet pas son état à zéro dans un effet :
@@ -215,6 +215,7 @@ backend que les tests (sessions, CSRF, visibilité). Se connecter avec `basile` 
 |---|---|
 | `npm run dev` | Serveur de développement Vite |
 | `npm run dev:mock` | Idem, avec l'API simulée par MSW |
+| `npm run typecheck` | Vérification TypeScript seule (`tsc -b`) |
 | `npm run build` | Vérification TypeScript + build de production dans `dist/` |
 | `npm run preview` | Sert le build de production en local |
 | `npm test` | Tests Vitest |

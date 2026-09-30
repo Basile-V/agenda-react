@@ -1,7 +1,6 @@
 # CLAUDE.md
 
-Guide de contexte et de bonnes pratiques pour travailler sur ce dépôt. Le brief complet est
-dans [PLAN.md](PLAN.md) : le lire avant toute nouvelle phase.
+Guide de contexte et de bonnes pratiques pour travailler sur ce dépôt.
 
 ## Le projet
 
@@ -14,7 +13,7 @@ développeur front React**. Il refait le front Angular du dépôt voisin
   justifier en entretien.
 - Le front Angular est la **référence fonctionnelle** (comportement attendu), pas une référence
   d'architecture : ne pas transposer services injectés, RxJS ou intercepteurs.
-- En cas de contradiction entre le front Angular et `PLAN.md` : **demander**.
+- En cas de contradiction entre le front Angular et ce guide : **demander**.
 
 ## Contraintes du kata (non négociables)
 
@@ -46,6 +45,7 @@ développeur front React**. Il refait le front Angular du dépôt voisin
 ```bash
 npm run dev        # Vite sur http://localhost:5173
 npm run dev:mock   # idem avec l'API simulée par MSW
+npm run typecheck  # tsc -b
 npm run build      # tsc -b && vite build
 npm run preview
 npm test           # vitest
@@ -255,7 +255,7 @@ sans toucher au backend. Tout changement côté backend se fait dans le dépôt 
 ## Tests
 
 - **TDD** pour la logique pure (`layout.ts`, `time.ts`) : test d'abord, couverture exhaustive
-  des cas listés dans `PLAN.md` §8, dont les 3 règles du kata vérifiées explicitement.
+  des cas limites, dont les 3 règles du kata vérifiées explicitement.
 - Tester **ce que voit l'utilisateur**, pas l'implémentation :
   - requêtes par priorité `getByRole` (avec `name`) > `getByLabelText` > `getByText` ;
     `getByTestId` en dernier recours ;
@@ -282,7 +282,7 @@ sans toucher au backend. Tout changement côté backend se fait dans le dépôt 
 ## Plugins Claude Code
 
 Deux plugins sont installés au niveau utilisateur. Ils complètent ce fichier sans le remplacer :
-**en cas de conflit, ce `CLAUDE.md` et `PLAN.md` priment.**
+**en cas de conflit, ce `CLAUDE.md` prime.**
 
 ### ponytail (sobriété du code)
 
@@ -334,7 +334,7 @@ le rafraîchissent automatiquement avant chaque requête.
 
 ## Git et workflow
 
-- Travailler **phase par phase** (`PLAN.md` §9) : à la fin de chaque phase, tests + lint verts,
+- Travailler **phase par phase** : à la fin de chaque phase, tests + lint verts,
   montrer le résultat et **attendre mon feu vert** avant la phase suivante.
 - **Ne jamais committer ni pousser sans demande explicite.**
 - Commits au format **Conventional Commits** (`feat:`, `fix:`, `test:`, `refactor:`, `chore:`,
