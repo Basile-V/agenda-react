@@ -1,5 +1,7 @@
 # Agenda — React 19
 
+[![CI](https://github.com/Basile-V/agenda-react/actions/workflows/ci.yml/badge.svg)](https://github.com/Basile-V/agenda-react/actions/workflows/ci.yml)
+
 Vue « jour » d'un agenda : un calendrier écrit **from scratch** en React 19, qui affiche, crée,
 modifie et supprime des événements, et répartit la largeur entre ceux qui se chevauchent.
 
@@ -29,8 +31,9 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 237 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
-  des assertions dédiées. TypeScript `strict`, ESLint avec règles typées.
+- **Testé** : 248 tests (Vitest, Testing Library, MSW) avec un seuil de couverture, plus 5 tests
+  Playwright qui mesurent les règles du kata dans un vrai navigateur. Tout tourne en CI.
+  TypeScript `strict`, ESLint avec règles typées.
 
 C'est la réécriture en React d'un front Angular existant (même backend, mêmes fonctionnalités).
 Le front Angular a servi de référence fonctionnelle, pas de modèle d'architecture.
@@ -44,6 +47,8 @@ Le front Angular a servi de référence fonctionnelle, pas de modèle d'architec
 - **Grille 09:00 → 21:00** : position et hauteur proportionnelles à l'heure et à la durée,
   recalculées quand la grille change de taille (`ResizeObserver`).
 - **Chevauchements** répartis selon les règles du kata (voir [plus bas](#algorithme-de-chevauchement)).
+- **Événements hors plage** : ceux qui tombent entièrement avant 09:00 ou après 21:00 sont listés
+  au-dessus de la grille, et s'ouvrent comme les autres, au lieu de disparaître.
 - **Création, détails, modification, suppression** dans des modales `<dialog>`. Les
   changements s'affichent tout de suite et reviennent en arrière si le serveur les refuse, avec un
   message qui explique pourquoi.
@@ -176,12 +181,14 @@ src/
   features/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
     calendar/   DayPage, CalendarHeader, DayGrid, EventBlock, EventFormDialog,
-                EventDetailsDialog, useDayEvents, layout.ts, time.ts, eventChanges.ts
+                EventDetailsDialog, OutOfRangeEvents, useDayEvents, layout.ts, time.ts,
+                eventChanges.ts
     loading/    useIsWaitingForServer, ServerWakeOverlay
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, ThemeToggle, icons
   styles/       variables CSS, reset
   test/         faux backend MSW, helpers de rendu, ResizeObserver de test
 worker/         proxy Cloudflare : /backend/* relayé vers le backend (même origine)
+e2e/            tests Playwright : l'application réelle dans Chromium, sur le faux backend MSW
 ```
 
 - `ui/` ne connaît ni l'API ni le domaine ; `api/` ne dépend pas de React.
@@ -218,9 +225,12 @@ backend que les tests (sessions, CSRF, visibilité). Se connecter avec `basile` 
 | `npm run typecheck` | Vérification TypeScript seule (`tsc -b`) |
 | `npm run build` | Vérification TypeScript + build de production dans `dist/` |
 | `npm run preview` | Sert le build de production en local |
-| `npm test` | Tests Vitest |
+| `npm test` | Tests Vitest (mode watch) |
+| `npm run test:coverage` | Tests Vitest avec couverture ; échoue sous les seuils de `vite.config.ts` |
+| `npm run test:e2e` | Tests Playwright (`npx playwright install chromium` la première fois) |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
+| `npm run format:check` | Vérifie le formatage sans rien modifier |
 
 ### Variables d'environnement
 
@@ -232,7 +242,9 @@ backend que les tests (sessions, CSRF, visibilité). Se connecter avec `basile` 
 ## Tests
 
 ```bash
-npm test
+npm test                # Vitest, mode watch
+npm run test:coverage   # une passe, avec couverture
+npm run test:e2e        # Playwright
 ```
 
 - **Logique pure** : `layout.ts` (événement seul, chevauchements, événements contigus,
@@ -247,6 +259,16 @@ npm test
 
 Les tests interrogent l'interface comme un utilisateur (rôles et noms accessibles), sans
 simuler `fetch` ni les modules internes : seul le réseau est intercepté, par MSW.
+
+- **Couverture** : seuils globaux vérifiés à chaque passe (95 % des instructions et 88 % des
+  branches au minimum), et 100 % exigés sur la logique pure (`layout.ts`, `time.ts`,
+  `eventChanges.ts`).
+- **Dans un vrai navigateur** ([`e2e/`](e2e/day.spec.ts)) : jsdom ne calcule aucune mise en
+  page, donc Playwright lance l'application dans Chromium et mesure les événements affichés.
+  Les trois règles du kata sont vérifiées à 1280 px et à 390 px, puis après un
+  redimensionnement, avec un parcours création puis suppression.
+- **CI** ([`ci.yml`](.github/workflows/ci.yml)) : lint, formatage, types, tests avec couverture,
+  build et tests Playwright à chaque push.
 
 ## Déploiement
 
