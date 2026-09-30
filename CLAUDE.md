@@ -35,7 +35,9 @@ développeur front React**. Il refait le front Angular du dépôt voisin
 - `react-router` v8 en mode librairie (`createBrowserRouter`, `RouterProvider`)
 - Modules SCSS (`sass-embedded`, dépendance de dev) + variables CSS, `<dialog>` natif pour les
   modales
-- Vitest + React Testing Library + `@testing-library/user-event` + MSW
+- Vitest + React Testing Library + `@testing-library/user-event` + MSW, couverture `@vitest/coverage-v8`
+- Playwright (`e2e/`) : l'application réelle dans Chromium, sur le faux backend MSW
+- CI GitHub Actions (`.github/workflows/ci.yml`)
 - ESLint flat config (`eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`,
   `typescript-eslint`) + Prettier
 - Déploiement : Cloudflare Workers (`wrangler.json`) : fichiers statiques + proxy `/api/*`
@@ -49,11 +51,17 @@ npm run typecheck  # tsc -b
 npm run build      # tsc -b && vite build
 npm run preview
 npm test           # vitest
+npm run test:coverage  # une passe, échoue sous les seuils de vite.config.ts
+npm run test:e2e   # Playwright (e2e/), démarre dev:mock sur le port 5174
 npm run lint
 npm run format
+npm run format:check
 ```
 
-Avant de déclarer une tâche terminée : `npm test`, `npm run lint` et `npm run build` passent.
+Une fois une tâche terminée, et **avant chaque commit** : lancer le skill `/pre-commit-checks`
+(`.claude/skills/pre-commit-checks/`). Il rejoue ce que fait la CI, dans cet ordre : `npm run lint`,
+`npm run format:check`, `npm run test:coverage`, `npm run build`, `npm run test:e2e`. Les cinq
+doivent passer ; en cas d'échec, corriger la cause puis tout relancer, sans affaiblir un contrôle.
 
 ## Architecture
 
@@ -66,12 +74,13 @@ src/
   features/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
     calendar/   DayPage, CalendarHeader, DayGrid, EventBlock, EventFormDialog,
-                EventDetailsDialog, useDayEvents, layout.ts, time.ts
+                EventDetailsDialog, OutOfRangeEvents, useDayEvents, layout.ts, time.ts
     loading/    useIsWaitingForServer, ServerWakeOverlay
   ui/           Button, IconButton, Dialog, TextField, Tabs, Spinner, icons.tsx
   styles/       variables.scss, reset.scss
   test/         setup, handlers MSW partagés, helpers de rendu
 worker/         proxy Cloudflare /backend/* → backend (tsconfig.worker.json, API web standard)
+e2e/            tests Playwright (mesures dans un vrai navigateur : règles du kata, parcours)
 ```
 
 Règles de dépendance entre dossiers :
@@ -334,9 +343,10 @@ le rafraîchissent automatiquement avant chaque requête.
 
 ## Git et workflow
 
-- Travailler **phase par phase** : à la fin de chaque phase, tests + lint verts,
+- Travailler **phase par phase** : à la fin de chaque phase, `/pre-commit-checks` vert,
   montrer le résultat et **attendre mon feu vert** avant la phase suivante.
-- **Ne jamais committer ni pousser sans demande explicite.**
+- **Ne jamais committer ni pousser sans demande explicite.** Quand un commit est demandé,
+  `/pre-commit-checks` doit avoir passé sur l'état exact qui est committé.
 - Commits au format **Conventional Commits** (`feat:`, `fix:`, `test:`, `refactor:`, `chore:`,
   `docs:`…), en anglais, un commit par unité logique.
 - **Ne pas ajouter de ligne `Co-Authored-By`** dans les messages de commit.
