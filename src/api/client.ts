@@ -66,6 +66,15 @@ async function send(path: string, { method = 'GET', body, signal }: RequestOptio
   }
 }
 
+// Their 401 is the answer itself (wrong credentials, dead refresh token), not an expired access
+// token. /api/auth/me is not one of them: restoring a session must survive the access token.
+const NO_REFRESH_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/refresh',
+  '/api/auth/logout',
+]);
+
 let refreshing: Promise<void> | null = null;
 
 /** Concurrent 401s share a single refresh request. */
@@ -139,8 +148,8 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
   const method = options.method ?? 'GET';
   let { response, xsrfToken } = await send(path, options);
 
-  // Expired access token: refresh once, then replay. /api/auth/* errors are meaningful as is.
-  if (response.status === 401 && !path.startsWith('/api/auth/')) {
+  // Expired access token: refresh once, then replay.
+  if (response.status === 401 && !NO_REFRESH_PATHS.has(path)) {
     await refreshSession();
     ({ response, xsrfToken } = await send(path, options));
   }

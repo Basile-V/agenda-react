@@ -70,6 +70,23 @@ describe('route protection', () => {
     expect(calls).toBe(1);
   });
 
+  test('restores a session whose access token expired, thanks to the refresh token', async () => {
+    db.sessionUserId = BASILE.id;
+    let calls = 0;
+    server.use(
+      http.get(apiUrl('/api/auth/me'), () =>
+        calls++ === 0
+          ? HttpResponse.json({ message: 'Authentification requise' }, { status: 401 })
+          : HttpResponse.json(BASILE),
+      ),
+    );
+    const { router } = renderWithRouter('/2026-09-29');
+
+    await findDayPage('2026-09-29');
+    expect(router.state.location.pathname).toBe('/2026-09-29');
+    expect(calls).toBe(2);
+  });
+
   test('/login redirects to today when already logged in', async () => {
     db.sessionUserId = BASILE.id;
     renderWithRouter('/login');

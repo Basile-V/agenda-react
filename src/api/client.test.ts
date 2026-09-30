@@ -210,11 +210,24 @@ describe('session refresh on 401', () => {
     unsubscribe();
   });
 
-  test('never refreshes for /api/auth/* requests', async () => {
+  test.each(['/api/auth/login', '/api/auth/register', '/api/auth/logout'])(
+    'never refreshes for %s, whose 401 is the answer itself',
+    async (path) => {
+      const refreshes = spyOn('post', '/api/auth/refresh', () => status(204));
+      const requests = spyOn('post', path, () => status(401));
+      await expect(apiFetch(path, { method: 'POST' })).rejects.toMatchObject({ status: 401 });
+      expect(refreshes).toHaveLength(0);
+      expect(requests).toHaveLength(1);
+    },
+  );
+
+  test('refreshes for /api/auth/me: restoring a session outlives the access token', async () => {
     const refreshes = spyOn('post', '/api/auth/refresh', () => status(204));
-    spyOn('get', '/api/auth/me', () => status(401));
-    await expect(apiFetch('/api/auth/me')).rejects.toMatchObject({ status: 401 });
-    expect(refreshes).toHaveLength(0);
+    const requests = spyOn('get', '/api/auth/me', (call) => (call === 0 ? status(401) : ok()));
+
+    await expect(apiFetch('/api/auth/me')).resolves.toEqual({ ok: true });
+    expect(refreshes).toHaveLength(1);
+    expect(requests).toHaveLength(2);
   });
 });
 

@@ -61,7 +61,7 @@ Organisation **par fonctionnalité** :
 
 ```
 src/
-  main.tsx, App.tsx, router.tsx
+  main.tsx, App.tsx, router.tsx, ErrorPage.tsx
   api/          apiFetch + fonctions typées (getEvents, createEvent, login…) + types
   features/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
@@ -233,8 +233,10 @@ Conventions de fichiers :
 - Toujours `credentials: 'include'`.
 - En-tête `X-XSRF-TOKEN` sur `POST`/`PUT`/`PATCH`/`DELETE`, lu via **`getXsrfToken()`**
   uniquement (pour pouvoir passer du cookie à un en-tête de réponse sans toucher au reste).
-- 401 hors `/api/auth/*` → **un seul** refresh partagé (promesse mémorisée), puis rejeu ; si le
-  refresh échoue → session perdue, retour `/login`.
+- 401 hors `login` / `register` / `refresh` / `logout` → **un seul** refresh partagé (promesse
+  mémorisée), puis rejeu ; si le refresh échoue → session perdue, retour `/login`.
+  `/api/auth/me` est rafraîchi comme le reste : la restauration de session survit au jeton
+  d'accès (15 min) tant que le refresh token (7 j) est valide.
 - 403 sur requête mutante avec jeton XSRF changé entre envoi et réponse → un seul rejeu.
 - Requête en attente après `SLOW_REQUEST_DELAY_MS` (2 s) → incrémente le compteur de
   requêtes lentes ; décrément à la fin, quel que soit le résultat.
