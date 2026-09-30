@@ -103,7 +103,7 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, message);
 }
 
-// The free-tier backend sleeps when idle and takes up to a minute to wake up. Only requests
+// The free-tier backend sleeps when idle and takes up to a few minutes to wake up. Only requests
 // slower than this are reported, so that a normal response never makes the overlay flash.
 export const SLOW_REQUEST_DELAY_MS = 2000;
 
@@ -162,7 +162,13 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
 
   if (!response.ok) throw await toApiError(response);
   const text = await response.text();
-  return text ? (JSON.parse(text) as unknown) : undefined;
+  if (!text) return undefined;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    // Not JSON (an HTML page from a proxy or a static host): still one of our typed errors.
+    throw unexpectedResponse();
+  }
 }
 
 /** For API modules: the server answered, but not with the expected shape. */

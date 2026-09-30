@@ -237,6 +237,14 @@ describe('responses and errors', () => {
     await expect(apiFetch('/api/thing')).resolves.toBeUndefined();
   });
 
+  test('a successful response that is not JSON is an ApiError, not a SyntaxError', async () => {
+    // What a misrouted request gets from a static host: its HTML fallback page, with a 200.
+    spyOn('get', '/api/thing', () => new HttpResponse('<!doctype html><html></html>'));
+    const error = await apiFetch('/api/thing').catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 502, message: 'Réponse inattendue du serveur.' });
+  });
+
   test('a 400 carries the server message', async () => {
     spyOn('post', '/api/thing', () => status(400, { message: "Nom d'utilisateur déjà utilisé" }));
     const error = await apiFetch('/api/thing', { method: 'POST' }).catch((e: unknown) => e);
