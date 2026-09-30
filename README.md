@@ -29,7 +29,7 @@ modifie et supprime des événements, et répartit la largeur entre ceux qui se 
   `useSyncExternalStore`.
 - **Accessible** : HTML sémantique, `<dialog>` natif, navigation clavier complète, focus
   restitué, contrastes AA vérifiés dans les deux thèmes.
-- **Testé** : 227 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
+- **Testé** : 235 tests (Vitest, Testing Library, MSW), dont les règles du kata vérifiées par
   des assertions dédiées. TypeScript `strict`, ESLint avec règles typées.
 
 C'est la réécriture en React d'un front Angular existant (même backend, mêmes fonctionnalités).
@@ -171,7 +171,7 @@ Organisation **par fonctionnalité** :
 
 ```
 src/
-  main.tsx, App.tsx, router.tsx
+  main.tsx, App.tsx, router.tsx, ErrorPage.tsx
   api/          apiFetch (cookies, CSRF, refresh, requêtes lentes) + fonctions typées + types
   features/
     auth/       AuthProvider, useAuth, RequireAuth, LoginPage, LoginForm, RegisterForm
