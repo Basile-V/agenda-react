@@ -221,6 +221,17 @@ describe('logout and session loss', () => {
     expect(db.sessionUserId).toBeNull();
   });
 
+  // Vitest fails the run on an unhandled rejection: this also checks that none escapes.
+  test('logout goes back to /login even when the server cannot be reached', async () => {
+    db.sessionUserId = BASILE.id;
+    server.use(http.post(apiUrl('/api/auth/logout'), () => HttpResponse.error()));
+    const { user, router } = renderWithRouter('/2026-09-29');
+    await user.click(await screen.findByRole('button', { name: 'Se déconnecter' }));
+
+    await screen.findByRole('tab', { name: 'Connexion' });
+    expect(router.state.location.pathname).toBe('/login');
+  });
+
   test('an expired session that cannot be refreshed goes back to /login', async () => {
     db.sessionUserId = BASILE.id;
     const { router } = renderWithRouter('/2026-09-29');

@@ -31,11 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession({ status: 'authenticated', user: await authApi.register(registration) });
       },
       logout: async () => {
-        try {
-          await authApi.logout();
-        } finally {
-          setSession({ status: 'anonymous' });
-        }
+        // The user asked to leave: the app logs out even if the server did not hear it.
+        // Its cookies then outlive this page (a reload would restore the session).
+        await authApi.logout().catch(() => {});
+        setSession({ status: 'anonymous' });
       },
     }),
     [session],
